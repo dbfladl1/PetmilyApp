@@ -12,21 +12,36 @@ import DotButton from "../atom/DotButton";
 import Comment from "./Comment";
 import Swiper from "react-native-swiper";
 import { feedType } from "@/app/(tabs)/sns/snsFeed";
-import { addLike, deleteFeed } from "@/service/api/snsApi";
+import { addLike, deleteFeed, loadPost } from "@/service/api/snsApi";
 import { alertDialog } from "../atom/Alert";
 import { useRouter } from "expo-router";
+import { TapGestureHandler } from "react-native-gesture-handler";
 
 type FeedProps = {
   content: feedType;
+  likeHandler: () => void;
   commentHandeler: () => void;
 };
 
-export default function Feed({ content, commentHandeler }: FeedProps) {
-  useEffect(() => {
-    console.log(content);
-  }, []);
+export default function Feed({
+  content,
+  likeHandler,
+  commentHandeler,
+}: FeedProps) {
 
-  const [feed, setFeed] = useState([]);
+
+  const [detailInfo, setDetailInfo] = useState(content);
+
+  useEffect(() => {
+    const loadFeedDetail = async () => {
+      const result = await loadPost(content.id);
+      setDetailInfo((prev) => ({
+        ...prev,
+        ...result,
+      }));
+    };
+    loadFeedDetail();
+  }, []);
 
   const router = useRouter();
 
@@ -44,7 +59,7 @@ export default function Feed({ content, commentHandeler }: FeedProps) {
             if (response.status === 200) {
               alertDialog("삭제되었습니다.");
 
-              router.replace("/sns/snsWrite");
+              router.replace("/sns/snsFeed");
             } else {
               alertDialog("다시 시도해주세요.");
             }
@@ -55,19 +70,6 @@ export default function Feed({ content, commentHandeler }: FeedProps) {
       },
     ]);
   };
-
-  const likedToggle = () => {
-    // setFeed((prev) => ({
-    //   ...prev,
-    //   isLiked: !prev.isLiked,
-    // }));
-    addLike({ postId: content.id });
-  };
-
-  const [comment, setComment] = useState({
-    active: false,
-    comment: [],
-  });
 
   const openComment = () => {
     commentHandeler();
@@ -114,64 +116,66 @@ export default function Feed({ content, commentHandeler }: FeedProps) {
           </View>
           <DotButton callbackFx={() => buttenPressHandle(content.id)} />
         </View>
-        <Swiper
-          showsPagination={true}
-          height={500}
-          loop={false}
-          paginationStyle={{ bottom: 20 }}
-          dotStyle={{
-            backgroundColor: "#eee",
-            width: 5,
-            height: 5,
-            borderRadius: 4,
-          }}
-          activeDotStyle={{
-            backgroundColor: "#7D3DCF",
-            width: 7,
-            height: 7,
-            borderRadius: 5,
-          }}
-        >
-          {content.imagePaths?.map((url, index) => (
-            <View style={styles.slide} key={index}>
-              <Image source={{ uri: url }} style={styles.image} />
-            </View>
-          ))}
-        </Swiper>
+        <TapGestureHandler numberOfTaps={2} onActivated={() => likeHandler()}>
+          <View>
+            <Swiper
+              showsPagination={true}
+              height={500}
+              loop={false}
+              paginationStyle={{ bottom: 20 }}
+              dotStyle={{
+                backgroundColor: "#eee",
+                width: 5,
+                height: 5,
+                borderRadius: 4,
+              }}
+              activeDotStyle={{
+                backgroundColor: "#7D3DCF",
+                width: 7,
+                height: 7,
+                borderRadius: 5,
+              }}
+            >
+              {content.imagePaths?.map((url, index) => (
+                <View style={styles.slide} key={index}>
+                  <Image source={{ uri: url }} style={styles.image} />
+                </View>
+              ))}
+            </Swiper>
+          </View>
+        </TapGestureHandler>
         <View style={styles.txtCon}>
           <View style={{ flexDirection: "row", gap: 5, marginBottom: 5 }}>
-            {content.isLiked === true ? (
-              <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity onPress={likedToggle} activeOpacity={1}>
-                  <Image
-                    source={require("@/assets/images/icon/heart-filled.png")}
-                    style={{ width: 27, height: 27 }}
-                  />
-                </TouchableOpacity>
-
-                <Text style={{ color: "#555", marginTop: 1, marginLeft: 5 }}>
-                  {content.likeCount}
-                </Text>
-              </View>
-            ) : (
-              <View>
-                <TouchableOpacity onPress={likedToggle} activeOpacity={1}>
-                  <Image
-                    source={require("@/assets/images/icon/heart.png")}
-                    style={{ width: 25, height: 25, marginLeft: 8 }}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-            {/* <TouchableOpacity onPress={openComment} activeOpacity={1}>
+            <TouchableOpacity
+              onPress={likeHandler}
+              activeOpacity={1}
+              style={{ flexDirection: "row", alignItems: "center" }}
+            >
+              <Image
+                source={
+                  content.isLiked
+                    ? require("@/assets/images/icon/heart-filled.png")
+                    : require("@/assets/images/icon/heart.png")
+                }
+                style={{ width: 25, height: 25, marginLeft: 8 }}
+              />
+              <Text style={{ color: "#555", marginLeft: 5 }}>
+                {content.likeCount}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={openComment}
+              activeOpacity={1}
+              style={{ flexDirection: "row" }}
+            >
               <Image
                 source={require("@/assets/images/icon/comment.png")}
                 style={{ width: 25, height: 25, marginLeft: 8 }}
               />
+              <Text style={{ color: "#555", marginTop: 1, marginLeft: 5 }}>
+                {detailInfo.totalCommentCount}
+              </Text>
             </TouchableOpacity>
-            <Text style={{ color: "#555", marginTop: 1, marginLeft: 2 }}>
-              {content.likeCount}
-            </Text> */}
           </View>
           <Text>{content.content}</Text>
           <Text style={styles.wDate}>{formatDate(content.createdAt)}</Text>
@@ -223,12 +227,12 @@ const styles = StyleSheet.create({
   slide: {
     justifyContent: "center",
     alignItems: "center",
-    height: "100%", // 슬라이드 높이 설정
+    height: "100%",
   },
   image: {
     width: "100%",
     height: "100%",
-    resizeMode: "cover", // 이미지 비율 유지
+    resizeMode: "cover",
   },
   wDate: {
     color: "#888",

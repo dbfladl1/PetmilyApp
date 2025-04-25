@@ -5,12 +5,20 @@ import { getUserInfo } from "@/service/api/userApi";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import { removeAccessToken } from "@/src/hooks/useAuth";
 
 export default function ModifyMain() {
   const [user, setUser] = useState<{
     loginId: string;
     profilePicturePath: string;
   }>({ loginId: "", profilePicturePath: "" });
+
+  const logout = () => {
+    removeAccessToken();
+    SecureStore.deleteItemAsync("refreshToken");
+    router.push("/user/login");
+  }
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -35,42 +43,40 @@ export default function ModifyMain() {
               router.push("/user/modify/ModifyInfo");
             }}
           >
-            <View style={styles.profileImageView}>
+            <View style={styles.iconImgView}>
               <Image
                 source={{ uri: user.profilePicturePath }}
                 style={styles.photoImg}
               />
             </View>
             <View style={{ justifyContent: "center" }}>
-              <Text>프로필 수정</Text>
+              <Text>회원정보 수정</Text>
               <Text>{user.loginId}</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.profileContainerItem}
             activeOpacity={1}
             onPress={() => {
               router.push("/user/modify/ModifyPw");
             }}
           >
-            <View style={styles.profileImageView}>
+            <View style={styles.iconImgView}>
               <Image
                 source={require("@/assets/images/icon/password.png")}
-                style={styles.photoImg}
+                style={styles.iconImg}
               ></Image>
             </View>
             <View style={{ justifyContent: "center" }}>
               <Text>비밀번호 변경</Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View style={styles.profileContainer}>
           <TouchableOpacity
             style={styles.profileContainerItem}
             activeOpacity={1}
-            onPress={() => {
-              router.push("/user/modify/ModifyPw");
-            }}
+            onPress={() => logout()}
           >
             <View style={{ justifyContent: "center" }}>
               <Text>로그아웃</Text>
@@ -101,7 +107,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#D0D0D0",
-    marginBottom: 30
+    marginBottom: 30,
   },
   profileContainerItem: {
     padding: 18,
@@ -116,6 +122,22 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 30,
     aspectRatio: 1,
+  },
+  iconImgView: {
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: "#C0C0C0",
+    overflow: "hidden",
+    marginRight: 30,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  iconImg: {
+    margin: "auto",
+    width: 15,
+    resizeMode: "contain",
   },
   buttonText: {
     color: "#FFFFFF",

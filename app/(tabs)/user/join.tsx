@@ -32,9 +32,7 @@ import { alertDialog } from "@/components/atom/Alert";
 import { addrType, userForm } from "@/interface/user";
 import { useRouter } from "expo-router";
 
-
 export default function JoinScreen() {
-
   const router = useRouter();
   const [user, setUser] = useState<userForm>({
     id: "",
@@ -126,7 +124,7 @@ export default function JoinScreen() {
     if (response !== 200) {
       return alertDialog("메일 인증 중 문제가 발생했습니다.");
     }
-    console.log(response)
+    console.log(response);
     setUser((prev) => ({ ...prev, emailVal: true }));
     return alertDialog("인증이 완료되었습니다.");
   }
@@ -193,7 +191,8 @@ export default function JoinScreen() {
         router.push("/user/login");
       } else {
         alertDialog("회원가입 중 에러가 발생했습니다.");
-      }    }
+      }
+    }
   }
 
   function valueCheck() {
@@ -301,9 +300,9 @@ export default function JoinScreen() {
             style={styles.input}
             placeholder="01012341234"
             placeholderTextColor="#A0A0A0"
-            keyboardType="numeric"
+            keyboardType="number-pad"
             onChangeText={(phone) => {
-              updateUserField("phone",phone);
+              updateUserField("phone", phone);
             }}
           />
         </View>
@@ -377,7 +376,7 @@ export default function JoinScreen() {
           </TouchableOpacity>
         </View> */}
 
-        <View>
+        {/* <View>
           <CText style={styles.label}>주소 찾기</CText>
           <View style={styles.inputRow}>
             <CTextInput
@@ -410,7 +409,7 @@ export default function JoinScreen() {
             placeholder="상세주소를 입력하세요"
             placeholderTextColor="#A0A0A0"
           />
-        </View>
+        </View> */}
         <CText style={styles.label}>약관</CText>
         <ScrollView style={styles.termBox} nestedScrollEnabled={true}>
           <Text>

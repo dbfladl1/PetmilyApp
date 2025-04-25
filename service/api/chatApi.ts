@@ -19,6 +19,8 @@ export const enrolledMypet = async (pet: petInfo) => {
   try {
     const response = await apiClient.post(`/api/v1/animal`, pet);
 
+    console.log(response);
+
     return response.status;
   } catch (error) {
     console.error("Error during API call:", error);
@@ -42,7 +44,13 @@ export const callGPTGenerateQuestion = async (
         messages: [
           {
             role: "system",
-            content: `${setChatHistory}와 ${petInfo}를 참고하고, 사용자의 질문을 확인해서 답변을 해줘, 추가 정보가 필요하다면 사용자에게 요청하도록 해.  ${setChatHistory}를 참고해서 형식에 맞게 반환해주면 돼. 넌 전문가니까 사용자에게 직접 말하듯, 상담하듯 말해. 하지만 정말말 어렵거나 답을 알 수 없는 질문은 전문가를 실제로 만나서서 상담을 권장하도록 해. `,
+            content: `${setChatHistory}와 ${petInfo}를 참고하고, 사용자의 질문을 확인해서 답변을 해줘, 추가 정보가 필요하다면 사용자에게 요청하도록 해.  ${setChatHistory}를 참고해서 형식에 맞게 반환해주면 돼. 넌 전문가니까 사용자에게 직접 말하듯, 상담하듯 말해. 하지만 정말말 어렵거나 답을 알 수 없는 질문은 전문가를 실제로 만나서서 상담을 권장하도록 해. 
+              주의:
+            - 전문가의 말투로 직접 상담하듯 이야기해 줘
+            - 사용자가 질문한 포인트에 대해 정확하고 신뢰 있는 답변을 줘
+            - 두루뭉술하거나 모호하게 말하지 마
+            '분석해보면 ~', '이 질문은 ~로 보입니다' 같은 말은 절대 하지 마. 바로 답변부터 시작해.
+            '~를 알려줘야합니다' 같은 말투도 금지야. 너는 지금 너를 찾아온 반려동물 주인에게 직접 상담을 해주는거야`,
           },
           {
             role: "user",
@@ -61,7 +69,6 @@ export const callGPTGenerateQuestion = async (
     );
 
     const gptQuestion = response.data.choices[0].message.content.trim();
-    console.log(response.data.choices[0].message.content.toString());
     return gptQuestion;
   } catch (error) {
     console.log(error);
@@ -101,10 +108,11 @@ export const callGPTGenerateAnswer = async (
   - 전문가의 말투로 직접 상담하듯 이야기해 줘
   - 사용자가 질문한 포인트에 대해 정확하고 신뢰 있는 답변을 줘
   - 두루뭉술하거나 모호하게 말하지 마
-  🚫 GPT야, '분석해보면 ~', '이 질문은 ~로 보입니다' 같은 말은 절대 하지 마. 바로 답변부터 시작해.
+   GPT야, '분석해보면 ~', '이 질문은 ~로 보입니다' 같은 말은 절대 하지 마. 바로 답변부터 시작해.
   '~를 알려줘야합니다' 같은 말투도 금지야. 너는 지금 너를 찾아온 반려동물 주인에게 직접 상담을 해주는거야
   - 마지막 답변만 생성해주면 돼
   `;
+  console.log("API KEY:", extra.OPENAI_API_KEY);
   try {
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
@@ -135,11 +143,7 @@ export const callGPTGenerateAnswer = async (
         },
       }
     );
-    console.log(petInfo);
-    console.log(setChatHistory);
-    console.log(answerGuide);
     const gptAnswer = response.data.choices[0].message.content.trim();
-    console.log("ekqqus", response.data.choices[0].message.content);
     return gptAnswer;
   } catch (error) {
     console.log(error);

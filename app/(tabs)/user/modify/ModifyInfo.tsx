@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { alertDialog } from "@/components/atom/Alert";
@@ -16,6 +17,7 @@ import { regEngNumChar, regLowerEngNum } from "@/service/Reg";
 import {
   getUserInfo,
   matchAuth,
+  modifyUser,
   profileUpdate,
   sendAuthCodeToEmail,
 } from "@/service/api/userApi";
@@ -25,14 +27,11 @@ import CBtn, { CLongBtn } from "@/components/atom/RNTouchableOpacity";
 import CPicker from "@/components/atom/RNPicker";
 import { Picker } from "@react-native-picker/picker";
 import SearchAddrView from "@/components/ui/SearchAddr";
-import * as DocumentPicker from "expo-document-picker";
 import Header from "@/components/ui/Header";
 import BottomNav from "@/components/ui/BottomNav";
-import { useAuth } from "@/context/AuthContext";
 import * as ImagePicker from "expo-image-picker";
 
 export default function ModifyInfo() {
-  const router = useRouter();
   const [user, setUser] = useState<userInfo>({
     email: "",
     emailVal: true,
@@ -40,7 +39,7 @@ export default function ModifyInfo() {
     joinDate: "",
     loginId: "",
     phone: "",
-    profilePicturePath: null,
+    profilePicturePath: "",
   });
 
   useEffect(() => {
@@ -104,12 +103,47 @@ export default function ModifyInfo() {
     if (response !== 200) {
       return alertDialog("메일 인증 중 문제가 발생했습니다.");
     }
-    console.log(response);
     setUser((prev) => ({ ...prev, emailVal: true }));
     return alertDialog("인증이 완료되었습니다.");
   }
+  const selectProfile = () => {
+    Alert.alert(
+      "프로필 사진",
+      "무엇을 하시겠어요?",
+      [
+        {
+          text: "앨범에서 선택",
+          onPress: () => openGallery(),
+        },
+        // {
+        //   text: "삭제",
+        //   style: "destructive",
+        //   onPress: () => {
+        //     setUser((prev) => ({
+        //       ...prev,
+        //       profilePicturePath: "",
+        //     }));
 
-  const [selectedImage, setSelectedImage] = useState<string>("");
+        //     profileModify("");
+        //   },
+        // },
+        {
+          text: "취소",
+          style: "cancel",
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  async function profileModify(imgUri: string) {
+    const result = await profileUpdate(imgUri);
+    if (result.status === 200) {
+      alertDialog("변경되었습니다.");
+    } else {
+      alertDialog("회원정보 변경에 실패했습니다.");
+    }
+  }
 
   const openGallery = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -125,13 +159,13 @@ export default function ModifyInfo() {
     });
 
     if (result.canceled) {
-      router.push("/sns/snsFeed");
+      return;
     } else {
       const imgUri = result.assets[0].uri;
-      setSelectedImage(imgUri);
+      setUser((prev) => ({ ...prev, profilePicturePath: imgUri }));
+      profileModify(imgUri);
     }
   };
-
   const [addr, setAddr] = useState<addrType>({
     state: false,
     address: "",
@@ -155,11 +189,16 @@ export default function ModifyInfo() {
   };
 
   async function modify() {
-    const result = await profileUpdate(selectedImage);
+    const modifiedInfo = {
+      email: user.email,
+      phone: user.phone,
+      gender: user.gender,
+    };
+    const result = await modifyUser(modifiedInfo);
     if (result.status === 200) {
       alertDialog("변경되었습니다.");
     } else {
-      alertDialog("회원정보 변경에 실패했습니다..");
+      alertDialog("회원정보 변경에 실패했습니다.");
     }
   }
 
@@ -173,6 +212,29 @@ export default function ModifyInfo() {
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
+          <View style={styles.profilePicture}>
+            <CText style={styles.title}>프로필 이미지 변경</CText>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={selectProfile}
+              style={styles.profileImageView}
+            >
+              <View style={styles.imgContainer}>
+                <Image
+                  source={
+                    user.profilePicturePath === ""
+                      ? require("@/assets/images/icon/photo.png")
+                      : { uri: user.profilePicturePath }
+                  }
+                  style={
+                    user.profilePicturePath === ""
+                      ? styles.photoImg
+                      : styles.profileImageView
+                  }
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
           <CText style={styles.title}>회원정보 수정</CText>
           <View>
             <CText style={styles.label}>전화번호</CText>
@@ -181,7 +243,7 @@ export default function ModifyInfo() {
               placeholder="01012341234"
               value={user.phone}
               placeholderTextColor="#A0A0A0"
-              keyboardType="numeric"
+              keyboardType="number-pad"
               onChangeText={(phone) => {
                 updateUserField("phone", phone);
               }}
@@ -189,7 +251,7 @@ export default function ModifyInfo() {
           </View>
 
           <View>
-            <CText style={styles.label}>* 이메일{user.phone}</CText>
+            <CText style={styles.label}>* 이메일</CText>
             <View style={styles.inputRow}>
               <CTextInput
                 style={[styles.input, styles.flex]}
@@ -242,31 +304,7 @@ export default function ModifyInfo() {
               <CText style={styles.smallButtonText}>코드 확인</CText>
             </CBtn>
           </View>
-          <View style={styles.profilePicture}>
-            <CText style={styles.label}>프로필 사진</CText>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={openGallery}
-              style={styles.profileImageView}
-            >
-              <View>
-                <Image
-                  source={
-                    selectedImage === ""
-                      ? require("@/assets/images/icon/photo.png")
-                      : { uri: selectedImage }
-                  }
-                  style={styles.photoImg}
-                />
-                <Image
-                  source={require("@/assets/images/icon/camera.png")}
-                  style={styles.imgBtn}
-                />
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          <View>
+          {/* <View>
             <CText style={styles.label}>주소 찾기</CText>
             <View style={styles.inputRow}>
               <CTextInput
@@ -299,11 +337,13 @@ export default function ModifyInfo() {
               placeholder="상세주소를 입력하세요"
               placeholderTextColor="#A0A0A0"
             />
-          </View>
+          </View> */}
 
-          <CLongBtn style={styles.button} onPress={modify}>
-            <CText style={styles.smallButtonText}>회원정보 수정</CText>
-          </CLongBtn>
+          <View style={styles.btnContainer}>
+            <CLongBtn style={styles.button} onPress={modify}>
+              <CText style={styles.smallButtonText}>회원정보 수정</CText>
+            </CLongBtn>
+          </View>
         </ScrollView>
         <View>
           <BottomNav />
@@ -361,7 +401,6 @@ const styles = StyleSheet.create({
   },
   profileImageView: {
     position: "relative",
-    marginTop: 5,
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -369,25 +408,19 @@ const styles = StyleSheet.create({
     borderColor: "#C0C0C0",
     overflow: "hidden",
   },
-  imgBtn: {
-    position: "absolute",
-    bottom: 0,
-    right: -5,
-    borderColor: "#ddd",
-    width: 15,
-    height: 15,
-    padding: 5,
-    borderRadius: 2,
+  profilePicture: {
+    marginBottom: 30,
+    height: 100,
+  },
+  imgContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#fff",
   },
-  profilePicture: {
-    marginBottom: 15,
-    height: 90,
-  },
   photoImg: {
-    margin: "auto",
-    width: "100%",
-    aspectRatio: 1,
+    width: 15,
+    height: 15,
   },
   button: {
     width: "100%",
@@ -408,5 +441,8 @@ const styles = StyleSheet.create({
   },
   smallText: {
     fontSize: 12,
+  },
+  btnContainer: {
+    marginTop: 30,
   },
 });

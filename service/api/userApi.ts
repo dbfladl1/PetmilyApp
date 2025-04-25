@@ -1,3 +1,4 @@
+import { modifyUserInfo } from "@/interface/user";
 import apiClient from "./apiClient";
 
 export const checkIdDupicate = async (userId: string) => {
@@ -117,8 +118,12 @@ export const getUserInfo = async () => {
   }
 };
 
-export const modifyUserInfo = async () => {
+export const modifyUser = async (user: modifyUserInfo) => {
+  console.log("respne!!!",user);
   try {
+    const response = await apiClient.put("/api/v1/member", user);
+    console.log("respne!!!",response);
+    return response.data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -149,7 +154,7 @@ export const profileUpdate = async (imageUri: string) => {
         return data;
       },
     });
-    console.log(response)
+    console.log(response);
     return response;
   } catch (error) {
     console.error(error);

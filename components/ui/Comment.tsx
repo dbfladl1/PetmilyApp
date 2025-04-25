@@ -7,32 +7,27 @@ import {
   TextInput,
   Animated,
   PanResponder,
+  Image,
+  Pressable,
+  Alert,
 } from "react-native";
 import CBtn from "../atom/RNTouchableOpacity";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { createComment, deleteComment } from "@/service/api/snsApi";
+import { CommentProps } from "@/interface/post";
+import { alertDialog } from "../atom/Alert";
+import CommentItem from "../atom/CommentItem";
 
-type contentsDetails = {
-  id: number,
-  content: string,
-  imagePaths: string[  ],
-  createdAt: string,
-  likeCount: number
-} 
-
-export default function Comment({ comment, closeComment }: any) {
+export default function Comment({
+  comments,
+  postId,
+  closeComment,
+  getComment,
+}: CommentProps) {
   const [isVisible, setIsVisible] = useState(true);
   const barRef = useRef<View>(null); // null로 초기화
-  const comments = [
-    { userId: "ULIM", text: "어디보고있어 ㅎㅎ", date: "2024-01-18" },
-    { userId: "UUNG", text: "우와 기여워", date: "2024-01-19" },
-    { userId: "APPLE", text: "꺄아", date: "2024-01-21" },
-  ];
-  // const [comments, setComments] = useState<contentsDetails>([]);
 
-  useEffect(()=>{
-    console.log(comment)
-    // setComments(comment)
-  },[])
+  const [content, setContent] = useState("");
 
   const pan = useRef(new Animated.Value(0)).current;
 
@@ -89,6 +84,20 @@ export default function Comment({ comment, closeComment }: any) {
     return null;
   } // 패널 숨김 처리
 
+  const addCommentHandler = async () => {
+    const result = await createComment(postId, {
+      content,
+      parentComentId: "0",
+    });
+    if (result.status === 200) {
+      getComment();
+      setContent("");
+    } else {
+      return alertDialog("댓글 등록에 실패했습니다.");
+    }
+  };
+
+
   return (
     <SafeAreaProvider style={styles.overlay}>
       <Animated.View
@@ -102,21 +111,18 @@ export default function Comment({ comment, closeComment }: any) {
           <View style={styles.bar}></View>
         </View>
         <ScrollView style={styles.commentBox}>
-          {comments.map((comment, i) => (
-            <View style={{ marginBottom: 10 }}>
-              <Text style={{ color: "#888", fontSize: 12 }}>
-                {comment.userId}
-              </Text>
-              <View style={{ flexDirection: "row", gap: 7 }} key={i}>
-                <Text style={{ fontWeight: "bold" }}>{comment.userId}</Text>
-                <Text>{comment.text}</Text>
-              </View>
-            </View>
+          {comments.map((comment) => (
+            <CommentItem postId={postId} comment={comment}/>
           ))}
         </ScrollView>
         <View style={styles.typeArea}>
-          <TextInput style={styles.inputBox} multiline={true} />
-          <CBtn style={{ width: "17%" }}>
+          <TextInput
+            value={content}
+            style={styles.inputBox}
+            multiline={true}
+            onChangeText={(content) => setContent(content)}
+          />
+          <CBtn style={{ width: "17%" }} onPress={addCommentHandler}>
             <Text style={{ color: "#fff" }}>등록</Text>
           </CBtn>
         </View>
@@ -134,14 +140,16 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0, // bottom을 0으로 설정해 전체 화면 덮기
+    bottom: 0,
   },
   panel: {
+    position: "absolute",
     width: "100%",
-    height: "90%",
+    height: "85%",
     backgroundColor: "#fff",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
+    paddingBottom: 50,
   },
   handler: {
     height: 33,
@@ -175,5 +183,15 @@ const styles = StyleSheet.create({
     borderBottomColor: "#555",
     borderBottomWidth: 0.5,
     width: "80%",
+  },
+  basicImage: {
+    height: 29,
+    width: 29,
+    margin: 7,
+  },
+  profileImage: {
+    height: 35,
+    width: 35,
+    borderRadius: 25,
   },
 });

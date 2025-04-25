@@ -3,7 +3,11 @@ import React from "react";
 import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-export default function BottomNav({ onNavigate }: { onNavigate?: (path: string) => void }) {
+export default function BottomNav({
+  onNavigate,
+}: {
+  onNavigate?: (path: string) => void;
+}) {
   const router = useRouter();
   const fallbackRouter = useRouter(); // props 없으면 기본 router 사용
 
@@ -48,7 +52,7 @@ export default function BottomNav({ onNavigate }: { onNavigate?: (path: string) 
       <View style={styles.iconContainer}>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => handlePress("/help/ChatAI")}
+          onPress={() => handlePress("/help/ChatMain")}
         >
           <Image
             source={require("@/assets/images/icon/idea.png")}
@@ -70,7 +74,12 @@ export default function BottomNav({ onNavigate }: { onNavigate?: (path: string) 
           <Image
             source={require("@/assets/images/icon/user.png")}
             resizeMode="cover"
-            style={{ aspectRatio: 1, width: 23, height: 23 }}
+            style={{
+              aspectRatio: 1,
+              width: 23,
+              height: 23,
+              resizeMode: "contain",
+            }}
           />
         </TouchableOpacity>
       </View>

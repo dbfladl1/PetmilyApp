@@ -1,8 +1,5 @@
-import { getAccessToken } from "@/src/hooks/useAuth";
-import { useAuth } from "@/src/context/AuthContext";
 import apiClient from "./apiClient";
 
-const accessToken = getAccessToken();
 
 export const loadAllFeedContents = async () => {
   try {
@@ -15,22 +12,70 @@ export const loadAllFeedContents = async () => {
   }
 };
 
-// export const loadComment = async (id: number) => {
-//   try {
-//     const response = await apiClient.get(`/api/v1/feed/${id}`);
-//     console.log(response.data);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error during API call:", error);
+export const loadPost = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/api/v1/feed/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error during API call:", error);
 
-//     throw error;
-//   }
-// };
+    throw error;
+  }
+};
+
+export const loadComment = async (feedId: string) => {
+  try {
+    const response = await apiClient.get(`/api/v1/feed/${feedId}/comments`);
+    console.log(response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error during API call:", error);
+
+    throw error;
+  }
+};
+
+export const createComment = async (
+  feedId: string,
+  data: { content: string; parentComentId: string }
+) => {
+  try {
+    const response = await apiClient.post(
+      `/api/v1/feed/${feedId}/comments`,
+      data
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error during API call:", error);
+
+    throw error;
+  }
+};
+
+export const deleteComment = async (
+  feedId: string,
+  commentId: string,
+) => {
+  try {
+    console.log(feedId, commentId)
+    const response = await apiClient.delete(
+      `/api/v1/feed/${feedId}/comments/${commentId}`,
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error during API call:", error);
+
+    throw error;
+  }
+};
 
 export const addLike = async (data: { postId: string }) => {
   try {
     const response = await apiClient.post(`/api/v1/feed/click-like`, data);
-    console.log(response);
+
     return response;
   } catch (error) {
     console.error(error);

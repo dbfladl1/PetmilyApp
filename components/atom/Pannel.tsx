@@ -13,29 +13,38 @@ export default function Pannel({
   title,
   list,
   selectHandle,
+  onClose,
+  onOpen,
+  isOpen,
 }: {
   title: string;
   list: any[];
-  selectHandle: (pet:any) => void;
+  selectHandle: (pet: any) => void;
+  onClose: () => void;
+  onOpen: () => void;
+  isOpen: boolean;
 }) {
-  const [active, setActive] = useState(false);
-  const activePannel = () => {
-    setActive((pre) => !pre);
-  };
+  useEffect(() => {
+    console.log("🔄 isOpen changed:", isOpen);
+  }, [isOpen]);
 
+  const selectHandler = (pet: any) => {
+    selectHandle(pet);
+    onClose();
+  };
   return (
     <View style={{ position: "absolute" }}>
-      <TouchableOpacity style={styles.btn} onPress={activePannel}>
+      <TouchableOpacity style={styles.btn} onPress={onOpen}>
         <Image
           source={require("@/assets/images/icon/hambergur.png")}
           style={styles.hambergur}
           resizeMode="contain"
         />
       </TouchableOpacity>
-      <View style={active ? styles.pannelActive : styles.pannelHide}>
+      <View style={isOpen ? styles.pannelActive : styles.pannelHide}>
         <View style={{ flexDirection: "row", gap: 5 }}>
           <View>
-            <TouchableOpacity style={styles.backBtn} onPress={activePannel}>
+            <TouchableOpacity style={styles.backBtn} onPress={onClose}>
               <Image
                 source={require("@/assets/images/icon/back.png")}
                 resizeMode="contain"
@@ -49,7 +58,11 @@ export default function Pannel({
         </View>
         {list.length >= 1 &&
           list.map((pet: any, index) => (
-            <TouchableOpacity style={styles.list} onPress={()=>selectHandle(pet)} key={index}>
+            <TouchableOpacity
+              style={styles.list}
+              onPress={() => selectHandler(pet)}
+              key={index}
+            >
               <Text>{pet.name}</Text>
             </TouchableOpacity>
           ))}

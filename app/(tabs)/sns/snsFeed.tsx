@@ -11,7 +11,11 @@ import {
 import BottomNav from "@/components/ui/BottomNav";
 import Comment from "@/components/ui/Comment";
 import { useRouter } from "expo-router";
-import { loadAllFeedContents } from "@/service/api/snsApi";
+import {
+  addLike,
+  loadAllFeedContents,
+  loadComment,
+} from "@/service/api/snsApi";
 
 export type feedType = {
   id: string;
@@ -19,6 +23,7 @@ export type feedType = {
   imagePaths: string[] | null;
   createdAt: string;
   likeCount: number;
+  totalCommentCount: number;
   feedsWriterName: string;
   isLiked: boolean | null;
   isWriter: boolean;
@@ -26,8 +31,8 @@ export type feedType = {
 };
 
 export default function SnsFeedScreen() {
+  const router = useRouter();
   const [feeds, setFeeds] = useState<feedType[]>([]);
-
 
   useEffect(() => {
     const fetchFeedData = async () => {
@@ -39,25 +44,47 @@ export default function SnsFeedScreen() {
         } else {
           setFeeds([]);
         }
-        
       } catch (error) {
         console.error("❌ [ERROR] 피드 데이터를 불러오는 중 오류 발생:", error);
       }
     };
 
-      fetchFeedData();
+    fetchFeedData();
   }, []);
 
-  const router = useRouter();
+  const toggleLike = (postId: string) => {
+    setFeeds((prev) =>
+      prev.map((feed) =>
+        feed.id === postId
+          ? {
+              ...feed,
+              isLiked: !feed.isLiked,
+              likeCount: feed.isLiked ? feed.likeCount - 1 : feed.likeCount + 1,
+            }
+          : feed
+      )
+    );
+    addLike({ postId });
+  };
 
   const [comment, setComment] = useState({ state: false, list: [] });
+  const [selectedPostId, setSelectedPostId] = useState("");
 
   function openComment(id: string) {
-    // const fetchCommentData = async () => {
-    //   const result = await loadComment(id);
-    //   setComment({ state: true, list: result });
-    // };
-    // fetchCommentData();
+    setSelectedPostId(id);
+    const fetchCommentData = async () => {
+      const result = await loadComment(id);
+      setComment({ state: true, list: result });
+    };
+    fetchCommentData();
+  }
+
+  function fetchCommentAgain() {
+    const fetchCommentData = async () => {
+      const result = await loadComment(selectedPostId);
+      setComment({ state: true, list: result });
+    };
+    fetchCommentData();
   }
   function closeComment() {
     setComment({ state: false, list: [] });
@@ -76,6 +103,7 @@ export default function SnsFeedScreen() {
           return (
             <Feed
               content={feed}
+              likeHandler={() => toggleLike(feed.id)}
               commentHandeler={() => openComment(feed.id)}
               key={i}
             />
@@ -85,10 +113,6 @@ export default function SnsFeedScreen() {
       <View>
         <BottomNav />
       </View>
-      {/* {comment.state && (
-        <Comment comment={comment.list} closeComment={closeComment} />
-      )} */}
-
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => router.push("/sns/snsWrite")}
@@ -98,6 +122,14 @@ export default function SnsFeedScreen() {
           style={styles.buttonImg}
         />
       </TouchableOpacity>
+      {comment.state && (
+        <Comment
+          comments={comment.list}
+          postId={selectedPostId}
+          closeComment={closeComment}
+          getComment={fetchCommentAgain}
+        />
+      )}
     </View>
   );
 }

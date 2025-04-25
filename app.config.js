@@ -31,7 +31,7 @@ export default {
         [
           "@mj-studio/react-native-naver-map",
           {
-            client_id: `${extra.NAVER_CLIENT_ID}`,
+            client_id: `${process.env.NAVER_CLIENT_ID}`,
             android: {
               ACCESS_FINE_LOCATION: true,
               ACCESS_COARSE_LOCATION: true,
@@ -55,11 +55,11 @@ export default {
         typedRoutes: true
       },
       extra: {
-        NAVER_CLIENT_ID: `${extra.NAVER_CLIENT_ID}`,
-        NAVER_CLIENT_SECRET: `${extra.NAVER_CLIENT_SECRET}`,
-        NAVER_APIGW_ID: `${extra.NAVER_APIGW_ID}`,
-        NAVER_APIGW_KEY: `${extra.NAVER_APIGW_KEY}`,
-        OPENAI_API_KEY: `${extra.OPENAI_API_KEY}`,
+        NAVER_CLIENT_ID: `${process.env.NAVER_CLIENT_ID}`,
+        NAVER_CLIENT_SECRET: `${process.env.NAVER_CLIENT_SECRET}`,
+        NAVER_APIGW_ID: `${process.env.NAVER_APIGW_ID}`,
+        NAVER_APIGW_KEY: `${process.env.NAVER_APIGW_KEY}`,
+        OPENAI_API_KEY: `${process.env.OPENAI_API_KEY}`,
       }
     }
   };

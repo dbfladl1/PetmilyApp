@@ -27,33 +27,35 @@ export default function LoginScreen() {
     const checkAutoLogin = async () => {
       try {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
+        console.log("refT", refreshToken);
 
         if (refreshToken !== null) {
           setAutoLogin(true);
           const result = await submitRefreshToken({ refreshToken });
           const token = result.token;
-          setAccessToken(token);
+          await setAccessToken(token);
+          router.push("/sns/snsFeed");
         }
       } catch (error) {
         alertDialog("로그인 실패");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkAutoLogin();
   }, []);
 
-  useEffect(() => {
-    const checkToken = async () => {
-      const token = await getAccessToken();
-      console.log(token)
-      if (token && token !== "") {
-        router.push("/sns/snsFeed");
-      } else {
-        setIsLoading(false);
-      }
-    };
-    checkToken();
-  }, [loginState]);
+  // const checkToken = async () => {
+  //   const token = await getAccessToken();
+  //   console.log("tocken",token)
+  //   console.log(isLoading)
+  //   if (token && token !== "") {
+  //     router.push("/sns/snsFeed");
+  //   } else {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -66,12 +68,16 @@ export default function LoginScreen() {
   }
 
   const loginHandler = async () => {
-    const response = await testLogin(user);
+    console.log("click");
+    const response = await login(user);
+    console.log(response?.data);
 
     if (response?.status === 200) {
+      const token = response.data.token;
+      console.log("초기", token);
       if (autoLogin === true) {
-        const token = response.data.token;
-        setAccessToken(token);
+        console.log(response);
+        await setAccessToken(token);
         const setCookieHeader = response?.headers["set-cookie"];
         if (setCookieHeader && setCookieHeader.length > 0) {
           const refreshToken = setCookieHeader
@@ -80,11 +86,12 @@ export default function LoginScreen() {
 
           refreshToken &&
             (await SecureStore.setItemAsync("refreshToken", refreshToken));
-          setLoginState(true);
         }
       } else {
+        setAccessToken(token);
         await SecureStore.deleteItemAsync("refreshToken");
       }
+      router.push("/sns/snsFeed");
     } else {
       alertDialog("아이디와 비밀번호를 확인해주세요.");
     }
@@ -175,6 +182,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
+    borderRadius: 27,
   },
   title: {
     fontSize: 24,

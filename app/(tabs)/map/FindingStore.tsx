@@ -13,18 +13,14 @@ import {
   Platform,
   Text,
   Image,
+  TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 import CPicker from "@/components/atom/RNPicker";
 import { Picker } from "@react-native-picker/picker";
 import CategoryList from "@/components/atom/CategoryList";
 import { useRouter } from "expo-router";
-import {
-  NAVER_APIGW_ID,
-  NAVER_APIGW_KEY,
-  NAVER_CLIENT_ID,
-  NAVER_CLIENT_SECRET,
-} from "@env";
 
 import InfoLayer from "@/components/atom/InfoLayer";
 import { Place } from "@/interface/map";
@@ -37,6 +33,49 @@ export default function FindingStoreScreen() {
     latitude: 37.5665,
     longitude: 126.978,
   });
+
+  const fetchPlaces = async (latitude:number, longitude:number) => {
+    try {
+      const [cafes, restaurants, parks] = await Promise.all([
+        searchPetFriendlyPlaces(
+          "애견 동반 카페",
+          latitude,
+          longitude
+        ),
+        searchPetFriendlyPlaces(
+          "애견 동반 식당",
+          latitude,
+          longitude
+        ),
+        searchPetFriendlyPlaces(
+          "반려견놀이터",
+          latitude,
+          longitude
+        ),
+      ]);
+
+      const categorizedCafes = cafes.map((place: Place) => ({
+        ...place,
+        type: "카페",
+      }));
+      const categorizedRestaurants = restaurants.map((place: Place) => ({
+        ...place,
+        type: "식당",
+      }));
+      const categorizedParks = parks.map((place: Place) => ({
+        ...place,
+        type: "공원",
+      }));
+
+      setPlaces([
+        ...categorizedCafes,
+        ...categorizedRestaurants,
+        ...categorizedParks,
+      ]);
+    } catch (error) {
+      console.error("❌ [ERROR] 장소 검색 실패:", error);
+    }
+  };
 
   const requestLocationPermission = async () => {
     if (Platform.OS === "android") {
@@ -57,6 +96,7 @@ export default function FindingStoreScreen() {
 
   const getCurrentLocation = async () => {
     const hasPermission = await requestLocationPermission();
+    
     if (!hasPermission) return;
 
     Geolocation.getCurrentPosition(
@@ -65,6 +105,7 @@ export default function FindingStoreScreen() {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         });
+        fetchPlaces(position.coords.latitude, position.coords.longitude);
       },
       (error) => {
         console.error("위치 가져오기 실패:", error);
@@ -80,6 +121,8 @@ export default function FindingStoreScreen() {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
   const [places, setPlaces] = useState<Place[]>([]);
+
+  const [mapCenter, setMapCenter] = useState(location);
 
   useEffect(() => {
     if (!location) return;
@@ -157,13 +200,13 @@ export default function FindingStoreScreen() {
             onValueChange={(link) => router.push(link as any)}
           >
             <Picker.Item
-              label="반려동물 동반 가능 장소 찾기"
+              label="근처 반려동물 동반 가능 장소 찾기"
               value="/map/FindingStore"
             />
-            <Picker.Item
+            {/* <Picker.Item
               label="반려동물 찾기 도움 서비스"
               value="/map/FindingPet"
-            />
+            /> */}
           </CPicker>
         </View>
       </View>
@@ -173,6 +216,12 @@ export default function FindingStoreScreen() {
           latitude: location.latitude,
           longitude: location.longitude,
           zoom: 15,
+        }}
+        onCameraIdle={(e) => {
+          setMapCenter({
+            latitude: e.latitude,
+            longitude: e.longitude,
+          });
         }}
       >
         {processedPlaces.length > 0 &&
@@ -196,6 +245,32 @@ export default function FindingStoreScreen() {
             );
           })}
       </NaverMapView>
+      <View
+        style={{
+          position: "absolute",
+          top: 120,
+          width: "100%",
+          alignItems: "center",
+          zIndex: 10,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => fetchPlaces(mapCenter.latitude, mapCenter.longitude)}
+          style={{
+            backgroundColor: "#FFF",
+            paddingVertical: 5,
+            paddingHorizontal: 15,
+            borderRadius: 20,
+            flexDirection: "row",
+          }}
+        >
+          <Image
+            source={require("@/assets/images/icon/refresh.png")}
+            style={{ width: 15, height: 15, marginTop: 3 }}
+          ></Image>
+          <Text style={{ marginLeft: 5 }}>이 지역에서 재검색</Text>
+        </TouchableOpacity>
+      </View>
       {selectedPlace && (
         <InfoLayer
           place={selectedPlace}

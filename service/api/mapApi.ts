@@ -18,7 +18,7 @@ export const getAddressFromCoords = async (
         },
         headers: {
           "X-NCP-APIGW-API-KEY-ID": extra.NAVER_APIGW_ID,
-          "X-NCP-APIGW-API-KEY": extra.NAVER_CLIENT_SECRET,
+          "X-NCP-APIGW-API-KEY": extra.NAVER_APIGW_KEY,
         },
       }
     );
@@ -57,7 +57,6 @@ export const searchPlaces = async (
         },
       }
     );
-
     return response.data.items;
   } catch (error) {
     if (axios.isAxiosError(error)) {

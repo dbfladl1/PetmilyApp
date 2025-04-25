@@ -32,5 +32,12 @@ export interface userInfo {
   joinDate: string;
   loginId: string;
   phone: string;
-  profilePicturePath: string | null;
+  profilePicturePath: string;
+}
+
+
+export interface modifyUserInfo {
+  email:string,
+  phone: string,
+  gender: string,
 }
