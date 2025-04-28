@@ -77,7 +77,7 @@ export const callGPTGenerateQuestion = async (
 };
 
 export const callGPTGenerateAnswer = async (
-  petInfo: object,
+  petInfo: any,
   setChatHistory: object[],
   answerGuide: string
 ) => {
@@ -92,6 +92,9 @@ export const callGPTGenerateAnswer = async (
   
     type이 'question'이면 전문가가 한 질문이고,
     type이 'answer'면 사용자의 답변이야.
+
+  반려동물은 ${petInfo}에 해당하니니 해당 반려동물의 특성에 맞게 대답해줘
+
   
   💡 목적: ${answerGuide}의 내용에 맞추어 답변해줘
     guide에 포함된 각 항목을 기반으로 답변을 구조화해야 해. 하지만 guide내용을 한번 더 표시해 줄 필요는 없어
@@ -111,8 +114,9 @@ export const callGPTGenerateAnswer = async (
    GPT야, '분석해보면 ~', '이 질문은 ~로 보입니다' 같은 말은 절대 하지 마. 바로 답변부터 시작해.
   '~를 알려줘야합니다' 같은 말투도 금지야. 너는 지금 너를 찾아온 반려동물 주인에게 직접 상담을 해주는거야
   - 마지막 답변만 생성해주면 돼
+  - "반려동물"이라는 말 대신에 ${petInfo.species}라고 말해줘줘
   `;
-  console.log("API KEY:", extra.OPENAI_API_KEY);
+  console.log("API :", petInfo);
   try {
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
@@ -128,9 +132,7 @@ export const callGPTGenerateAnswer = async (
             content: `  아래는 상담 기록이야:  
             상담 기록:
             ${JSON.stringify(setChatHistory, null, 2)}
-            
-            반려동물 정보:
-            ${JSON.stringify(petInfo, null, 2)}`,
+            `,
           },
         ],
         max_tokens: 3000,
