@@ -123,27 +123,6 @@ export default function JoinScreen() {
     return alertDialog("인증이 완료되었습니다.");
   }
 
-  // async function handleFilePicker() {
-  //   const result: any = await DocumentPicker.getDocumentAsync({
-  //     type: "image/*",
-  //   });
-
-  //   if (result.type === "cancel") {
-  //     console.log("Document selection was canceled");
-  //     return;
-  //   }
-  //   const file = result.assets[0];
-  //   // Blob 객체 생성
-  //   const response = await fetch(file.uri);
-  //   const blob = await response.blob();
-
-  //   // FormData 생성
-  //   const formData = new FormData();
-
-  //   formData.append("file", blob, file.name);
-
-  //   putMemberProfileImg(formData);
-  // }
 
   const [addr, setAddr] = useState<addrType>({
     state: false,
