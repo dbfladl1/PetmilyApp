@@ -2,15 +2,9 @@ import React, { MutableRefObject, useRef, useState } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   Image,
   ScrollView,
-  Alert,
-  Modal,
-  TextInput,
-  NativeSyntheticEvent,
-  TextInputChangeEventData,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
@@ -360,23 +354,7 @@ export default function JoinScreen() {
             <CText style={styles.smallButtonText}>코드 확인</CText>
           </CBtn>
         </View>
-        {/* <View style={styles.profilePicture}>
-          <CText style={styles.label}>프로필 사진</CText>
-          <TouchableOpacity activeOpacity={1} onPress={handleFilePicker}>
-            <View style={styles.profileImageView}>
-              <Image
-                source={require("@/assets/images/icon/photo.png")}
-                style={styles.photoImg}
-              />
-              <Image
-                source={require("@/assets/images/icon/camera.png")}
-                style={styles.imgBtn}
-              />
-            </View>
-          </TouchableOpacity>
-        </View> */}
-
-        {/* <View>
+        <View>
           <CText style={styles.label}>주소 찾기</CText>
           <View style={styles.inputRow}>
             <CTextInput
@@ -409,7 +387,7 @@ export default function JoinScreen() {
             placeholder="상세주소를 입력하세요"
             placeholderTextColor="#A0A0A0"
           />
-        </View> */}
+        </View>
         <CText style={styles.label}>약관</CText>
         <ScrollView style={styles.termBox} nestedScrollEnabled={true}>
           <Text>
