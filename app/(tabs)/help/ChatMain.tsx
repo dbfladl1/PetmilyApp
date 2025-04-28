@@ -3,7 +3,6 @@ import {
   Text,
   ActivityIndicator,
   TouchableOpacity,
-  ScrollView,
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -26,7 +25,7 @@ export default function ChatMain() {
 
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
-  const fetchPetInfo = async () => {
+  async function fetchPetInfo () {
     try {
       const res = await getMyPet();
       if (res.animalInfos.length === 0) {
@@ -102,19 +101,32 @@ export default function ChatMain() {
           </TouchableOpacity>
         </View>
       </View>
-      <TouchableWithoutFeedback onPress={()=>setIsPanelOpen(false)}>
-        <View style={{ flex: 1 }}>
-          {chatType === "add" ? (
-            <AddPet />
-          ) : chatType === "chat" ? (
-            <ChatAi pet={selectedPet} petInfoChanged={fetchPetInfo} />
-          ) : (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          )}
-        </View>
-      </TouchableWithoutFeedback>
+      <View style={{ flex: 1 }} pointerEvents="box-none">
+        {chatType === "add" ? (
+          <AddPet />
+        ) : chatType === "chat" ? (
+          <ChatAi pet={selectedPet} petInfoChanged={fetchPetInfo} />
+        ) : (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        )}
+      </View>
+      {isPanelOpen && (
+        <TouchableWithoutFeedback onPress={() => setIsPanelOpen(false)}>
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "transparent",
+            }}
+          />
+        </TouchableWithoutFeedback>
+      )}
+
       <View>
         <BottomNav />
       </View>
