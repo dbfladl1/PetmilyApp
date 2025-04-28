@@ -45,7 +45,7 @@ export default function ChatAi({
     step: 0,
     message: "어떤 도움이 필요하신가요?",
     type: "question",
-    examples: ["식용 가능여부", "행동 분석", "행동 훈련/교정", "건강"],
+    examples: ["먹어도 되나요?", "행동 분석", "행동 훈련/교정", "건강"],
   };
 
   const [chatHistory, setChatHistory] = useState<questionInfo[]>(
@@ -82,7 +82,7 @@ export default function ChatAi({
     let isHandledByRule = true;
 
     if (answerInfo.step === 0) {
-      if (answerInfo.message === "식용 가능여부") {
+      if (answerInfo.message === "먹어도 되나요?") {
         newFlow = [...chatFlow, ...questions["food"]];
       } else if (answerInfo.message === "행동 분석") {
         newFlow = [...chatFlow, ...questions["behavior"]];
