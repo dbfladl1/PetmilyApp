@@ -7,13 +7,10 @@ import {
   TextInput,
   Animated,
   PanResponder,
-  Image,
-  Pressable,
-  Alert,
 } from "react-native";
 import CBtn from "../atom/RNTouchableOpacity";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { createComment, deleteComment } from "@/service/api/snsApi";
+import { createComment } from "@/service/api/snsApi";
 import { CommentProps } from "@/interface/post";
 import { alertDialog } from "../atom/Alert";
 import CommentItem from "../atom/CommentItem";
@@ -24,6 +21,16 @@ export default function Comment({
   closeComment,
   getComment,
 }: CommentProps) {
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 10);
+  
+    return () => clearTimeout(timer);
+  }, [comments]);
+
   const [isVisible, setIsVisible] = useState(true);
   const barRef = useRef<View>(null); // null로 초기화
 
@@ -84,7 +91,7 @@ export default function Comment({
     return null;
   } // 패널 숨김 처리
 
-  const addCommentHandler = async () => {
+  const submitComment = async () => {
     const result = await createComment(postId, {
       content,
       parentComentId: "0",
@@ -96,7 +103,6 @@ export default function Comment({
       return alertDialog("댓글 등록에 실패했습니다.");
     }
   };
-
 
   return (
     <SafeAreaProvider style={styles.overlay}>
@@ -110,9 +116,9 @@ export default function Comment({
         <View ref={barRef} style={styles.handler}>
           <View style={styles.bar}></View>
         </View>
-        <ScrollView style={styles.commentBox}>
+        <ScrollView style={styles.commentBox} ref={scrollRef}>
           {comments.map((comment) => (
-            <CommentItem postId={postId} comment={comment}/>
+            <CommentItem postId={postId} comment={comment} />
           ))}
         </ScrollView>
         <View style={styles.typeArea}>
@@ -122,7 +128,7 @@ export default function Comment({
             multiline={true}
             onChangeText={(content) => setContent(content)}
           />
-          <CBtn style={{ width: "17%" }} onPress={addCommentHandler}>
+          <CBtn style={{ width: "17%" }} onPress={submitComment}>
             <Text style={{ color: "#fff" }}>등록</Text>
           </CBtn>
         </View>
