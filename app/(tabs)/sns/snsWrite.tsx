@@ -69,7 +69,7 @@ export default function SnsWriteScreen() {
 
       alertDialog("[ERROR]");
     } finally {
-      setIsUploading(false);
+      isUploadingNow = false;
     }
   }
 
