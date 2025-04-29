@@ -14,16 +14,18 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   header: {
-    height: 56,
+    height: 58,
     borderBottomWidth: 0.5,
     borderBottomColor: "#bbb",
     zIndex: 100,
+    padding:0
   },
   logo: {
-    height: 45,
-    width: 45,
+    height: 63,
+    width: 53,
     margin: "auto",
-    marginTop: 5,
-    marginBottom: 5,
+    marginTop: 0,
+    objectFit:"cover",
+    transform:"translateY(-5px)"
   },
 });
