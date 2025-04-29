@@ -3,7 +3,7 @@ import apiClient from "./apiClient";
 
 export const checkIdDupicate = async (userId: string) => {
   try {
-    const response = await apiClient.get(`api/v1/member/check-id/${userId}`);
+    const response = await apiClient.get(`/api/v1/member/check-id/${userId}`);
 
     return response.status;
   } catch (error) {
@@ -31,6 +31,7 @@ export const sendAuthCodeToEmail = async (data: { email: string }) => {
       "/api/v1/member/email-auth/send-code",
       data
     );
+    
     return response.status;
   } catch (error) {
     console.error("Error during API call:", error);
