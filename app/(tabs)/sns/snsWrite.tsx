@@ -12,9 +12,7 @@ import DraggableFlatList, {
 } from "react-native-draggable-flatlist";
 import { useRouter } from "expo-router";
 import Header from "@/components/ui/Header";
-import {
-  ScrollView,
-} from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import { alertDialog } from "@/components/atom/Alert";
 import * as ImagePicker from "expo-image-picker";
 import CBtn from "@/components/atom/RNTouchableOpacity";
@@ -28,7 +26,7 @@ export default function SnsWriteScreen() {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
 
   useEffect(() => {
-    const openGallery = async () => {
+    async function openGallery() {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
@@ -48,18 +46,32 @@ export default function SnsWriteScreen() {
         const uris = result.assets.map((asset) => asset.uri);
         setSelectedImages(uris);
       }
-    };
+    }
 
     openGallery();
   }, []);
 
-  const uploadFeedHandler = async () => {
+  let isUploadingNow = false;
+  async function uploadFeedHandler() {
+    if (isUploadingNow) return;
+    isUploadingNow = true;
+
     const result = await uploadFeed(contents, selectedImages);
 
-    if(result === 200){
-      router.push("/sns/snsFeed");
+    try {
+      if (result === 200) {
+        router.push("/sns/snsFeed");
+      } else {
+        alertDialog("업로드 실패", "다시 시도해주세요.");
+      }
+    } catch (err) {
+      console.log(err);
+
+      alertDialog("[ERROR]");
+    } finally {
+      setIsUploading(false);
     }
-  };
+  }
 
   const renderItem = ({ item, drag, isActive }: RenderItemParams<string>) => {
     const index = selectedImages.findIndex((img) => img === item);
@@ -151,7 +163,7 @@ const styles = StyleSheet.create({
   backButton: {
     width: 28,
     height: 30,
-    marginVertical: 8,
+    marginVertical: 15,
     padding: 5,
     marginLeft: 10,
     marginRight: 20,
@@ -165,10 +177,9 @@ const styles = StyleSheet.create({
   screenHeaderText: {
     fontSize: 18,
     fontWeight: "bold",
-    lineHeight: 40,
+    lineHeight: 45,
     color: "#444",
   },
-  nextButton: {},
   bigImage: { width: "100%", aspectRatio: 1 },
   imageContainer: { flexDirection: "row", padding: 0 },
   image: { position: "relative", width: 75, marginRight: 5, marginTop: 5 },
