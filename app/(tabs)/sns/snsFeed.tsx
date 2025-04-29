@@ -79,10 +79,10 @@ export default function SnsFeedScreen() {
     fetchComment(id);
   }
 
-  async function fetchComment (selectedPostId: string) {
+  async function fetchComment(selectedPostId: string) {
     const result = await loadComment(selectedPostId);
     setComment({ state: true, list: result });
-  };
+  }
 
   function closeComment() {
     setComment({ state: false, list: [] });
@@ -90,13 +90,11 @@ export default function SnsFeedScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View>
-        <Header />
-      </View>
       <ScrollView
         style={{ flex: 1, flexDirection: "column" }}
         contentContainerStyle={{ flexGrow: 1 }}
       >
+        <Header />
         {feeds?.map((feed, i) => {
           return (
             <Feed
