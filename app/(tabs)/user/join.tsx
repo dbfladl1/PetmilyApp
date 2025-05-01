@@ -57,11 +57,18 @@ export default function JoinScreen() {
       return alertDialog("아이디 형식을 확인해주세요");
     }
 
-    if (await checkIdDupicate(user.id)) {
-      setUser((prev) => ({ ...prev, idVal: true }));
-      return alertDialog("아이디를 사용하실 수 있습니다.");
-    } else {
-      return alertDialog("아이디를 조회 중 문제가 발생했습니다.");
+    const idChk = (await checkIdDupicate(user.id)).data.isValidLoginId;
+
+    try {
+      if (idChk) {
+        setUser((prev) => ({ ...prev, idVal: true }));
+        return alertDialog("아이디를 사용하실 수 있습니다");
+      } else {
+        return alertDialog("아이디가 이미 존재합니다");
+      }
+    } catch (err) {
+      console.log(err);
+      return alertDialog("[Error]");
     }
   }
 
@@ -94,15 +101,23 @@ export default function JoinScreen() {
 
     setUser((prev) => ({ ...prev, email }));
 
-    const response = await sendAuthCodeToEmail({ email });
-    if (response !== 200) {
-      return alertDialog("인증번호 발송에 실패했습니다");
+    const emailVal = (await sendAuthCodeToEmail({ email })).data.isValidEmail;
+    try {
+      if (emailVal) {
+        return alertDialog(
+          "인증번호를 전송했습니다",
+          "인증번호는 3분간 유효합니다"
+        );
+      }else{
+        return alertDialog(
+          "해당 이메일이 이미 존재합니다"
+        );
+      }
+    } catch (err) {
+      console.log(err);
+      return alertDialog("[Error]: 인증코드 발송에 실패했습니다");
     }
     setSendAuth(true);
-    return alertDialog(
-      "인증번호를 전송했습니다",
-      "인증번호는 3분간 유효합니다"
-    );
   }
 
   const [authCode, setAuthCode] = useState("");
@@ -122,7 +137,6 @@ export default function JoinScreen() {
     setUser((prev) => ({ ...prev, emailVal: true }));
     return alertDialog("인증이 완료되었습니다.");
   }
-
 
   const [addr, setAddr] = useState<addrType>({
     state: false,

@@ -35,6 +35,7 @@ export default function FindingStoreScreen() {
   });
 
   const fetchPlaces = async (latitude:number, longitude:number) => {
+    console.log("장소 검색")
     try {
       const [cafes, restaurants, parks] = await Promise.all([
         searchPetFriendlyPlaces(
@@ -256,6 +257,7 @@ export default function FindingStoreScreen() {
       >
         <TouchableOpacity
           onPress={() => fetchPlaces(mapCenter.latitude, mapCenter.longitude)}
+          activeOpacity={1}
           style={{
             backgroundColor: "#FFF",
             paddingVertical: 5,

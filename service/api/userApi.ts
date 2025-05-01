@@ -5,7 +5,7 @@ export const checkIdDupicate = async (userId: string) => {
   try {
     const response = await apiClient.get(`/api/v1/member/check-id/${userId}`);
 
-    return response.status;
+    return response;
   } catch (error) {
     console.error("Error during API call:", error);
 
@@ -32,7 +32,7 @@ export const sendAuthCodeToEmail = async (data: { email: string }) => {
       data
     );
     
-    return response.status;
+    return response;
   } catch (error) {
     console.error("Error during API call:", error);
 
