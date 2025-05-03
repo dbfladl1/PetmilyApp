@@ -1,10 +1,10 @@
 export default {
     expo: {
-      name: "petmily-app",
+      name: "PETMILY",
       slug: "petmily-app",
       version: "1.0.0",
       orientation: "portrait",
-      icon: "./assets/images/icon.png",
+      icon: "./assets/images/appIcon-Img.png",
       scheme: "petmily",
       userInterfaceStyle: "automatic",
       newArchEnabled: true,
@@ -60,6 +60,9 @@ export default {
         NAVER_APIGW_ID: `${process.env.NAVER_APIGW_ID}`,
         NAVER_APIGW_KEY: `${process.env.NAVER_APIGW_KEY}`,
         OPENAI_API_KEY: `${process.env.OPENAI_API_KEY}`,
+        eas: {
+          projectId: "7ccb8b5e-5429-4cc8-9745-19b01e11c5de"
+        }
       }
     }
   };

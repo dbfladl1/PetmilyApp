@@ -34,24 +34,13 @@ export default function FindingStoreScreen() {
     longitude: 126.978,
   });
 
-  const fetchPlaces = async (latitude:number, longitude:number) => {
+  const fetchPlaces = async (latitude: number, longitude: number) => {
+    console.log(latitude, longitude);
     try {
       const [cafes, restaurants, parks] = await Promise.all([
-        searchPetFriendlyPlaces(
-          "애견 동반 카페",
-          latitude,
-          longitude
-        ),
-        searchPetFriendlyPlaces(
-          "애견 동반 식당",
-          latitude,
-          longitude
-        ),
-        searchPetFriendlyPlaces(
-          "반려견놀이터",
-          latitude,
-          longitude
-        ),
+        searchPetFriendlyPlaces("애견 동반 카페", latitude, longitude),
+        searchPetFriendlyPlaces("애견 동반 식당", latitude, longitude),
+        searchPetFriendlyPlaces("반려견놀이터", latitude, longitude),
       ]);
 
       const categorizedCafes = cafes.map((place: Place) => ({
@@ -72,6 +61,7 @@ export default function FindingStoreScreen() {
         ...categorizedRestaurants,
         ...categorizedParks,
       ]);
+      console.log(places);
     } catch (error) {
       console.error("❌ [ERROR] 장소 검색 실패:", error);
     }
@@ -96,16 +86,17 @@ export default function FindingStoreScreen() {
 
   const getCurrentLocation = async () => {
     const hasPermission = await requestLocationPermission();
-    
+
     if (!hasPermission) return;
 
     Geolocation.getCurrentPosition(
       (position) => {
-        setLocation({
+        const current = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-        });
-        fetchPlaces(position.coords.latitude, position.coords.longitude);
+        };
+        setLocation(current); 
+        setMapCenter(current);
       },
       (error) => {
         console.error("위치 가져오기 실패:", error);
@@ -123,55 +114,6 @@ export default function FindingStoreScreen() {
   const [places, setPlaces] = useState<Place[]>([]);
 
   const [mapCenter, setMapCenter] = useState(location);
-
-  useEffect(() => {
-    if (!location) return;
-
-    const fetchPlaces = async () => {
-      try {
-        const [cafes, restaurants, parks] = await Promise.all([
-          searchPetFriendlyPlaces(
-            "애견 동반 카페",
-            location.latitude,
-            location.longitude
-          ),
-          searchPetFriendlyPlaces(
-            "애견 동반 식당",
-            location.latitude,
-            location.longitude
-          ),
-          searchPetFriendlyPlaces(
-            "반려견놀이터",
-            location.latitude,
-            location.longitude
-          ),
-        ]);
-
-        const categorizedCafes = cafes.map((place: Place) => ({
-          ...place,
-          type: "카페",
-        }));
-        const categorizedRestaurants = restaurants.map((place: Place) => ({
-          ...place,
-          type: "식당",
-        }));
-        const categorizedParks = parks.map((place: Place) => ({
-          ...place,
-          type: "공원",
-        }));
-
-        setPlaces([
-          ...categorizedCafes,
-          ...categorizedRestaurants,
-          ...categorizedParks,
-        ]);
-      } catch (error) {
-        console.error("❌ [ERROR] 장소 검색 실패:", error);
-      }
-    };
-
-    fetchPlaces();
-  }, [location]);
 
   const processedPlaces = places.map((place: Place) => {
     const parsedMapX = parseFloat(place.mapx.toString());
@@ -255,7 +197,10 @@ export default function FindingStoreScreen() {
         }}
       >
         <TouchableOpacity
-          onPress={() => fetchPlaces(mapCenter.latitude, mapCenter.longitude)}
+          onPress={() => {
+            fetchPlaces(mapCenter.latitude, mapCenter.longitude);
+          }}
+          activeOpacity={1}
           style={{
             backgroundColor: "#FFF",
             paddingVertical: 5,
@@ -268,7 +213,7 @@ export default function FindingStoreScreen() {
             source={require("@/assets/images/icon/refresh.png")}
             style={{ width: 15, height: 15, marginTop: 3 }}
           ></Image>
-          <Text style={{ marginLeft: 5 }}>이 지역에서 재검색</Text>
+          <Text style={{ marginLeft: 5 }}>이 지역에서 검색</Text>
         </TouchableOpacity>
       </View>
       {selectedPlace && (

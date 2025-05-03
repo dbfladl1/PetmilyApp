@@ -9,11 +9,11 @@ export const getAddressFromCoords = async (
 ) => {
   try {
     const response = await axios.get(
-      `https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc`,
+      "https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc",
       {
         params: {
           coords: `${longitude},${latitude}`,
-          orders: "roadaddr",
+          orders: "addr,roadaddr", // ✅ 둘 다 요청
           output: "json",
         },
         headers: {
@@ -23,9 +23,15 @@ export const getAddressFromCoords = async (
       }
     );
 
-    const region = response.data.results[0]?.region;
+    // addr(지번 주소) → roadaddr(도로명 주소) 우선순위로 선택
+    const results = response.data.results;
+    const jibun = results.find((r:{name:string}) => r.name === "addr");
+    const road = results.find((r:{name:string}) => r.name === "roadaddr");
+
+    const region = jibun?.region || road?.region;
     const city = region?.area1?.name;
     const district = region?.area2?.name;
+
     return district ? district : city;
   } catch (error) {
     console.error("❌ [ERROR] 좌표 변환 실패:", error);
@@ -40,6 +46,7 @@ export const searchPlaces = async (
 ) => {
   try {
     const address = await getAddressFromCoords(latitude, longitude);
+    console.log("쿠ㅓ리확인", latitude,longitude)
     const searchQuery = address ? `${query} ${address}` : query;
 
     const response = await axios.get(
@@ -57,6 +64,7 @@ export const searchPlaces = async (
         },
       }
     );
+    console.log(response.data.items)
     return response.data.items;
   } catch (error) {
     if (axios.isAxiosError(error)) {

@@ -28,6 +28,7 @@
       android:dataExtractionRules="@xml/secure_store_data_extraction_rules" 
       android:usesCleartextTraffic="true">
     <meta-data android:name="com.naver.maps.map.CLIENT_ID" android:value="7isoi1lsxq"/>
+    <meta-data android:name="com.naver.maps.map.NCP_KEY_ID" android:value="v4ozqi7o5z"/>
     <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
