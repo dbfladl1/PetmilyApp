@@ -1,7 +1,7 @@
 import BottomNav from "@/components/ui/BottomNav";
 import Header from "@/components/ui/Header";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   NaverMapMarkerOverlay,
   NaverMapView,
@@ -25,6 +25,7 @@ import { useRouter } from "expo-router";
 import InfoLayer from "@/components/atom/InfoLayer";
 import { Place } from "@/interface/map";
 import { searchPlaces as searchPetFriendlyPlaces } from "@/service/api/mapApi";
+import { Animated, Easing } from "react-native";
 
 export default function FindingStoreScreen() {
   const router = useRouter();
@@ -34,9 +35,28 @@ export default function FindingStoreScreen() {
     longitude: 126.978,
   });
 
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  const startRotation = () => {
+    rotateAnim.setValue(0);
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 500,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  };
+
+  const stopRotation = () => {
+    rotateAnim.stopAnimation();
+    rotateAnim.setValue(0); // 각도 초기화
+  };
+
   const fetchPlaces = async (latitude: number, longitude: number) => {
-    console.log(latitude, longitude);
     try {
+      startRotation();
       const [cafes, restaurants, parks] = await Promise.all([
         searchPetFriendlyPlaces("애견 동반 카페", latitude, longitude),
         searchPetFriendlyPlaces("애견 동반 식당", latitude, longitude),
@@ -61,9 +81,10 @@ export default function FindingStoreScreen() {
         ...categorizedRestaurants,
         ...categorizedParks,
       ]);
-      console.log(places);
     } catch (error) {
       console.error("❌ [ERROR] 장소 검색 실패:", error);
+    } finally {
+      stopRotation();
     }
   };
 
@@ -95,7 +116,7 @@ export default function FindingStoreScreen() {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         };
-        setLocation(current); 
+        setLocation(current);
         setMapCenter(current);
       },
       (error) => {
@@ -124,6 +145,11 @@ export default function FindingStoreScreen() {
       latitude: parsedMapY / 10 ** 7,
       longitude: parsedMapX / 10 ** 7,
     };
+  });
+
+  const rotate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
   });
 
   return (
@@ -200,7 +226,7 @@ export default function FindingStoreScreen() {
           onPress={() => {
             fetchPlaces(mapCenter.latitude, mapCenter.longitude);
           }}
-          activeOpacity={1}
+          activeOpacity={0.6}
           style={{
             backgroundColor: "#FFF",
             paddingVertical: 5,
@@ -209,10 +235,15 @@ export default function FindingStoreScreen() {
             flexDirection: "row",
           }}
         >
-          <Image
+          <Animated.Image
             source={require("@/assets/images/icon/refresh.png")}
-            style={{ width: 15, height: 15, marginTop: 3 }}
-          ></Image>
+            style={{
+              width: 15,
+              height: 15,
+              marginTop: 3,
+              transform: [{ rotate }],
+            }}
+          />
           <Text style={{ marginLeft: 5 }}>이 지역에서 검색</Text>
         </TouchableOpacity>
       </View>
