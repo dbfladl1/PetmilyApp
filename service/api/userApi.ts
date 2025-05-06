@@ -1,6 +1,18 @@
 import { modifyUserInfo } from "@/interface/user";
 import apiClient from "./apiClient";
 
+export const checkUserInfo = async () => {
+  try {
+    const response = await apiClient.get(`/api/v1/member`);
+console.log(response.data)
+    return response.data;
+  } catch (error) {
+    console.error("Error during API call:", error);
+
+    throw error;
+  }
+};
+
 export const checkIdDupicate = async (userId: string) => {
   try {
     const response = await apiClient.get(`/api/v1/member/check-id/${userId}`);

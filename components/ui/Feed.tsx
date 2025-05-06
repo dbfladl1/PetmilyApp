@@ -16,6 +16,7 @@ import { addLike, deleteFeed, loadPost } from "@/service/api/snsApi";
 import { alertDialog } from "../atom/Alert";
 import { useRouter } from "expo-router";
 import { TapGestureHandler } from "react-native-gesture-handler";
+import { checkUserInfo } from "@/service/api/userApi";
 
 type FeedProps = {
   content: feedType;
@@ -28,8 +29,6 @@ export default function Feed({
   likeHandler,
   commentHandeler,
 }: FeedProps) {
-
-
   const [detailInfo, setDetailInfo] = useState(content);
 
   useEffect(() => {
@@ -45,7 +44,20 @@ export default function Feed({
 
   const router = useRouter();
 
-  const buttenPressHandle = (id: string) => {
+  const isWriterCurrentUser = async (writerId: string) => {
+    const user = await checkUserInfo();
+
+    return user.loginId === writerId;
+  };
+
+  const buttonPressHandle = async (postId: string, writerId: string) => {
+    
+    const result: boolean = await isWriterCurrentUser(writerId);
+
+    if (!result) {
+      return;
+    }
+
     Alert.alert("삭제하시겠습니까?", "", [
       {
         text: "취소",
@@ -55,7 +67,7 @@ export default function Feed({
         text: "삭제",
         onPress: async () => {
           try {
-            const response = await deleteFeed(id);
+            const response = await deleteFeed(postId);
             if (response.status === 200) {
               alertDialog("삭제되었습니다.");
 
@@ -114,7 +126,11 @@ export default function Feed({
             </View>
             <Text style={styles.topId}>{content.feedsWriterName}</Text>
           </View>
-          <DotButton callbackFx={() => buttenPressHandle(content.id)} />
+          <DotButton
+            callbackFx={() =>
+              buttonPressHandle(content.id, content.feedsWriterName)
+            }
+          />
         </View>
         <TapGestureHandler numberOfTaps={2} onActivated={() => likeHandler()}>
           <View>
