@@ -34,7 +34,7 @@ export default function LoginScreen() {
           const result = await submitRefreshToken({ refreshToken });
           const token = result.token;
           await setAccessToken(token);
-          router.push("/sns/snsFeed");
+          router.replace("/sns/snsFeed");
         }
       } catch (error) {
         alertDialog("로그인 실패");
@@ -89,7 +89,7 @@ export default function LoginScreen() {
         setAccessToken(token);
         await SecureStore.deleteItemAsync("refreshToken");
       }
-      router.push("/sns/snsFeed");
+      router.replace("/sns/snsFeed");
     } else {
       alertDialog("아이디와 비밀번호를 확인해주세요.");
     }
