@@ -17,6 +17,7 @@ import { alertDialog } from "../atom/Alert";
 import { useRouter } from "expo-router";
 import { TapGestureHandler } from "react-native-gesture-handler";
 import { checkUserInfo } from "@/service/api/userApi";
+import { Dimensions } from "react-native";
 
 type FeedProps = {
   content: feedType;
@@ -31,6 +32,11 @@ export default function Feed({
 }: FeedProps) {
   const [detailInfo, setDetailInfo] = useState(content);
 
+  const { width: screenWidth } = Dimensions.get("window");
+  const aspectRatio = 3 / 3;
+  const swiperHeight = screenWidth * (1 / aspectRatio); 
+
+  
   useEffect(() => {
     const loadFeedDetail = async () => {
       const result = await loadPost(content.id);
@@ -51,7 +57,6 @@ export default function Feed({
   };
 
   const buttonPressHandle = async (postId: string, writerId: string) => {
-    
     const result: boolean = await isWriterCurrentUser(writerId);
 
     if (!result) {
@@ -136,8 +141,8 @@ export default function Feed({
           <View>
             <Swiper
               showsPagination={true}
-              height={500}
               loop={false}
+              height={swiperHeight}
               paginationStyle={{ bottom: 20 }}
               dotStyle={{
                 backgroundColor: "#eee",
@@ -247,8 +252,8 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: "100%",
     resizeMode: "cover",
+    aspectRatio: 3 / 3,
   },
   wDate: {
     color: "#888",

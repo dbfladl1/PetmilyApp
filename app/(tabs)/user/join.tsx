@@ -57,11 +57,17 @@ export default function JoinScreen() {
       return alertDialog("아이디 형식을 확인해주세요");
     }
 
-    if (await checkIdDupicate(user.id)) {
-      setUser((prev) => ({ ...prev, idVal: true }));
-      return alertDialog("아이디를 사용하실 수 있습니다.");
-    } else {
-      return alertDialog("아이디를 조회 중 문제가 발생했습니다.");
+    try {
+      const isAvailable = await checkIdDupicate(user.id);
+  
+      if (isAvailable) {
+        setUser((prev) => ({ ...prev, idVal: true }));
+        return alertDialog("아이디를 사용하실 수 있습니다.");
+      } else {
+        return alertDialog("이미 사용 중인 아이디입니다."); // 조건 false인 경우
+      }
+    } catch (error) {
+      return alertDialog("아이디를 조회 중 오류가 발생했습니다."); // 네트워크 오류 등
     }
   }
 

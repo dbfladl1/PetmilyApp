@@ -68,9 +68,7 @@ export default function LoginScreen() {
   }
 
   const loginHandler = async () => {
-    console.log("click");
     const response = await login(user);
-    console.log(response?.data);
 
     if (response?.status === 200) {
       const token = response.data.token;

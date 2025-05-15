@@ -2,7 +2,7 @@ import { getAccessToken } from '@/src/hooks/useAuth';
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://furry-family.org:8080',
+  baseURL: 'https://api.furry-family.org',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
