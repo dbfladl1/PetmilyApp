@@ -14,7 +14,7 @@ import { getAccessToken, setAccessToken } from "@/src/utils/useAuth";
 import LoadingWrapper from "@/components/Loadingwrapper";
 import { handleCommonApiError } from "@/src/utils/clientErrorHandler";
 
-export default function LoginScreen() {
+export const LoginScreen=()=> {
   const [autoLogin, setAutoLogin] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState({ loginId: "", password: "" });
@@ -49,17 +49,6 @@ export default function LoginScreen() {
 
     checkAutoLogin();
   }, []);
-
-  // const checkToken = async () => {
-  //   const token = await getAccessToken();
-  //   console.log("tocken",token)
-  //   console.log(isLoading)
-  //   if (token && token !== "") {
-  //     router.push("/sns/snsFeed");
-  //   } else {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const [isLoading, setIsLoading] = useState(true);
 
