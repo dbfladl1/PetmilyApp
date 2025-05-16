@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { removeAccessToken } from "@/src/hooks/useAuth";
+import { removeAccessToken } from "@/src/utils/useAuth";
 
 export default function ModifyMain() {
   const [user, setUser] = useState<{
