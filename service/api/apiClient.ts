@@ -1,24 +1,21 @@
-import { getAccessToken } from '@/src/hooks/useAuth';
-import axios from 'axios';
+import { getAccessToken } from "@/src/utils/useAuth";
+import axios from "axios";
 
-const apiClient = axios.create({
-  baseURL: 'https://api.furry-family.org',
+export const apiClient = axios.create({
+  baseURL: "https://api.furry-family.org",
   timeout: 5000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 apiClient.interceptors.request.use(
-  async (config) => {
-    const token = await getAccessToken();
-    console.log("헤더",token)
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-export default apiClient;
+    async (config) => {
+      const token = await getAccessToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );

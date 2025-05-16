@@ -10,8 +10,9 @@ import { useRouter } from "expo-router";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { alertDialog } from "@/components/atom/Alert";
 import * as SecureStore from "expo-secure-store";
-import { getAccessToken, setAccessToken } from "@/src/hooks/useAuth";
+import { getAccessToken, setAccessToken } from "@/src/utils/useAuth";
 import LoadingWrapper from "@/components/Loadingwrapper";
+import { handleCommonApiError } from "@/src/utils/clientErrorHandler";
 
 export default function LoginScreen() {
   const [autoLogin, setAutoLogin] = useState(false);
@@ -21,18 +22,21 @@ export default function LoginScreen() {
   function updateUserField(field: keyof loginInfo, value: string) {
     setUser((prev) => ({ ...prev, [field]: value }));
   }
-  const [loginState, setLoginState] = useState(false);
 
   useEffect(() => {
     const checkAutoLogin = async () => {
       try {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
-        console.log("refT", refreshToken);
 
         if (refreshToken !== null) {
           setAutoLogin(true);
-          const result = await submitRefreshToken({ refreshToken });
-          const token = result.token;
+          const res = await submitRefreshToken({ refreshToken });
+          if (!res.success) {
+            const { status } = res;
+            handleCommonApiError(status, "login");
+            return;
+          }
+          const token = res.response.data.token;
           await setAccessToken(token);
           router.replace("/sns/snsFeed");
         }
@@ -67,31 +71,35 @@ export default function LoginScreen() {
     );
   }
 
-  const loginHandler = async () => {
-    const response = await login(user);
-
-    if (response?.status === 200) {
-      const token = response.data.token;
-      console.log("초기", token);
+  const handleLogin = async () => {
+    const res = await login(user);
+    if (!res.success) {
+      const { status, message } = res;
+      handleCommonApiError(status, message);
+      return;
+    }
+    if (res.success) {
+      const token = res.response.data.token;
+      const headers = res.response.headers;
       if (autoLogin === true) {
-        console.log(response);
         await setAccessToken(token);
-        const setCookieHeader = response?.headers["set-cookie"];
+        const setCookieHeader = headers["set-cookie"];
         if (setCookieHeader && setCookieHeader.length > 0) {
-          const refreshToken = setCookieHeader
-            .find((cookie) => /refreshToken=([^;]*)/.test(cookie))
+          const autoAuthRefreshToken = setCookieHeader
+            .find((cookie: string) => /refreshToken=([^;]*)/.test(cookie))
             ?.match(/refreshToken=([^;]*)/)?.[1];
 
-          refreshToken &&
-            (await SecureStore.setItemAsync("refreshToken", refreshToken));
+          autoAuthRefreshToken &&
+            (await SecureStore.setItemAsync(
+              "refreshToken",
+              autoAuthRefreshToken
+            ));
         }
       } else {
         setAccessToken(token);
         await SecureStore.deleteItemAsync("refreshToken");
       }
       router.replace("/sns/snsFeed");
-    } else {
-      alertDialog("아이디와 비밀번호를 확인해주세요.");
     }
   };
 
@@ -122,7 +130,7 @@ export default function LoginScreen() {
           }}
         />
 
-        <CLongBtn style={styles.button} onPress={loginHandler}>
+        <CLongBtn style={styles.button} onPress={handleLogin}>
           <CText style={styles.buttonText}>로그인</CText>
         </CLongBtn>
 
