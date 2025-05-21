@@ -9,7 +9,6 @@ import { CLongBtn } from "@/components/atom/RNTouchableOpacity";
 import { useRouter } from "expo-router";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { alertDialog } from "@/components/atom/Alert";
-import * as SecureStore from "expo-secure-store";
 import { apiProcess } from "@/src/utils/clientResHandler";
 import { ApiResult, ApiSuccess } from "@/interface/api";
 import { TokenStorage } from "@/src/utils/useAuth";
@@ -74,7 +73,7 @@ export const LoginScreen = () => {
   };
 
   const handleLogin = async () => {
-    const res = await login(user);
+    const res:ApiResult = await login(user);
     apiProcess(res, setUserAuth);
   };
 

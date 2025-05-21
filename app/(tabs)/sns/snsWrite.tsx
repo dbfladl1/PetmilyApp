@@ -17,6 +17,7 @@ import { alertDialog } from "@/components/atom/Alert";
 import * as ImagePicker from "expo-image-picker";
 import CBtn from "@/components/atom/RNTouchableOpacity";
 import { uploadFeed } from "@/service/api/snsApi";
+import { apiProcess } from "@/src/utils/clientResHandler";
 
 export default function SnsWriteScreen() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function SnsWriteScreen() {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsMultipleSelection: true,
-        quality: 1,
+        quality: 0.5,
       });
 
       if (result.canceled) {
@@ -52,26 +53,12 @@ export default function SnsWriteScreen() {
   }, []);
 
   let isUploadingNow = false;
-  async function uploadFeedHandler() {
+  const uploadFeedHandler = async () => {
     if (isUploadingNow) return;
     isUploadingNow = true;
-
-    const result = await uploadFeed(contents, selectedImages);
-
-    try {
-      if (result === 200) {
-        router.push("/sns/snsFeed");
-      } else {
-        alertDialog("업로드 실패", "다시 시도해주세요.");
-      }
-    } catch (err) {
-      console.log(err);
-
-      alertDialog("[ERROR]");
-    } finally {
-      isUploadingNow = false;
-    }
-  }
+    const res = await uploadFeed(contents, selectedImages);
+    apiProcess(res, async () => router.push("/sns/snsFeed"));
+  };
 
   const renderItem = ({ item, drag, isActive }: RenderItemParams<string>) => {
     const index = selectedImages.findIndex((img) => img === item);

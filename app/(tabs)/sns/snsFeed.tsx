@@ -16,40 +16,30 @@ import {
   loadAllFeedContents,
   loadComment,
 } from "@/service/api/snsApi";
-import { alertDialog } from "@/components/atom/Alert";
-
-export type feedType = {
-  id: string;
-  content: string;
-  imagePaths: string[] | null;
-  createdAt: string;
-  likeCount: number;
-  totalCommentCount: number;
-  feedsWriterName: string;
-  isLiked: boolean | null;
-  isWriter: boolean;
-  memberProfilePicturePath: string;
-};
+import { apiProcess } from "@/src/utils/clientResHandler";
+import { ApiSuccess } from "@/interface/api";
+import { feedType } from "@/interface/post";
 
 export default function SnsFeedScreen() {
-  const router = useRouter();
   const [feeds, setFeeds] = useState<feedType[]>([]);
 
-  useEffect(() => {
-    const fetchFeedData = async () => {
-      try {
-        const result = await loadAllFeedContents();
-        result ? setFeeds(result || []) : setFeeds([]);
-      } catch (error) {
-        console.error("❌ [ERROR] 피드 데이터를 불러오는 중 오류 발생:", error);
-        alertDialog("[ERROR] 피드 데이터를 불러오는 중 오류 발생:");
-      }
-    };
+  const [comment, setComment] = useState({ state: false, list: [] });
+  const [selectedPostId, setSelectedPostId] = useState("");
 
+  const router = useRouter();
+
+  useEffect(() => {
     fetchFeedData();
   }, []);
 
-  function likeOrDislike(postId: string) {
+  async function fetchFeedData() {
+    const res = await loadAllFeedContents();
+    apiProcess(res, async (res: ApiSuccess) => {
+      res ? setFeeds(res.response.data || []) : setFeeds([]);
+    });
+  }
+
+  const updateCount = async (postId: string) => {
     setFeeds((feed) => {
       const index = feed.findIndex((item) => item.id === postId);
       if (index === -1) return feed;
@@ -68,23 +58,26 @@ export default function SnsFeedScreen() {
 
       return newFeeds;
     });
-    addLike({ postId });
-  }
+  };
 
-  const [comment, setComment] = useState({ state: false, list: [] });
-  const [selectedPostId, setSelectedPostId] = useState("");
+  const handleLikeToggle = async (postId: string) => {
+    const res = await addLike({ postId });
+    apiProcess(res, () => updateCount(postId));
+  };
 
-  function openComment(id: string) {
+  function handleOpenComment(id: string) {
     setSelectedPostId(id);
     fetchComment(id);
   }
 
-  async function fetchComment(selectedPostId: string) {
-    const result = await loadComment(selectedPostId);
-    setComment({ state: true, list: result });
-  }
+  const fetchComment = async (selectedPostId: string) => {
+    const res = await loadComment(selectedPostId);
+    apiProcess(res, async (res: ApiSuccess) => {
+      setComment({ state: true, list: res.response.data });
+    });
+  };
 
-  function closeComment() {
+  function handleCloseComment() {
     setComment({ state: false, list: [] });
   }
 
@@ -95,13 +88,13 @@ export default function SnsFeedScreen() {
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <Header />
-        {feeds?.map((feed, i) => {
+        {feeds.map((feed) => {
           return (
             <Feed
+              key={feed.id}
               content={feed}
-              likeHandler={() => likeOrDislike(feed.id)}
-              commentHandeler={() => openComment(feed.id)}
-              key={i}
+              likeHandler={() => handleLikeToggle(feed.id)}
+              handleComment={() => handleOpenComment(feed.id)}
             />
           );
         })}
@@ -122,7 +115,7 @@ export default function SnsFeedScreen() {
         <Comment
           comments={comment.list}
           postId={selectedPostId}
-          closeComment={closeComment}
+          closeComment={handleCloseComment}
           getComment={() => fetchComment(selectedPostId)}
         />
       )}

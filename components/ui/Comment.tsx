@@ -14,6 +14,7 @@ import { createComment } from "@/service/api/snsApi";
 import { CommentProps } from "@/interface/post";
 import { alertDialog } from "../atom/Alert";
 import CommentItem from "../atom/CommentItem";
+import { apiProcess } from "@/src/utils/clientResHandler";
 
 export default function Comment({
   comments,
@@ -27,7 +28,7 @@ export default function Comment({
     const timer = setTimeout(() => {
       scrollRef.current?.scrollToEnd({ animated: true });
     }, 10);
-  
+
     return () => clearTimeout(timer);
   }, [comments]);
 
@@ -92,16 +93,14 @@ export default function Comment({
   } // 패널 숨김 처리
 
   const submitComment = async () => {
-    const result = await createComment(postId, {
+    const res = await createComment(postId, {
       content,
       parentComentId: "0",
     });
-    if (result.status === 200) {
+    await apiProcess(res, async () => {
       getComment();
       setContent("");
-    } else {
-      return alertDialog("댓글 등록에 실패했습니다.");
-    }
+    });
   };
 
   return (
@@ -118,7 +117,7 @@ export default function Comment({
         </View>
         <ScrollView style={styles.commentBox} ref={scrollRef}>
           {comments.map((comment) => (
-            <CommentItem postId={postId} comment={comment} />
+            <CommentItem key={comment.commentId} postId={postId} comment={comment} refresh={getComment} />
           ))}
         </ScrollView>
         <View style={styles.typeArea}>

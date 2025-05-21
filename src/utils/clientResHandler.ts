@@ -11,14 +11,14 @@ function returnCommonApiError(status: number, message: string) {
   }
 }
 
-export const apiProcess = async (
+export const apiProcess = async<T> (
   res: ApiResult,
-  callback: (res: ApiSuccess) => Promise<void>
+  callback: (res: ApiSuccess) => Promise<T>
 ) => {
   if (!res.success) {
     const { status, message } = res;
-    returnCommonApiError(status, message);
+    return returnCommonApiError(status, message);
   } else {
-    await callback(res);
+    return await callback(res);
   }
 };

@@ -13,7 +13,7 @@ export const checkUserInfo = async () => {
 
 export const checkIdDupicate = async (userId: string) => {
   const response = await ApiService.get(`/api/v1/member/check-id/${userId}`);
-  
+
   return response;
 };
 
@@ -99,7 +99,6 @@ export const profileUpdate = async (imageUri: string) => {
         return data;
       },
     });
-    console.log(response);
     return response;
   } catch (error) {
     console.error(error);

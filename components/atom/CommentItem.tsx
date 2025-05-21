@@ -3,13 +3,16 @@ import React, { useState } from "react";
 import { deleteComment } from "@/service/api/snsApi";
 import { alertDialog } from "./Alert";
 import { CommentItemType } from "@/interface/post";
+import { apiProcess } from "@/src/utils/clientResHandler";
 
 export default function CommentItem({
   postId,
   comment,
+  refresh,
 }: {
   postId: string;
   comment: CommentItemType;
+  refresh: () => void;
 }) {
   const [pressed, setPressed] = useState(false);
 
@@ -20,12 +23,11 @@ export default function CommentItem({
         text: "삭제",
         onPress: async () => {
           try {
-            const response = await deleteComment(postId, commentId);
-            if (response.status === 200) {
+            const res = await deleteComment(postId, commentId);
+            await apiProcess(res, async () => {
               alertDialog("삭제되었습니다.");
-            } else {
-              alertDialog("다시 시도해주세요.");
-            }
+              refresh();
+            });
           } catch (error) {
             alertDialog("오류 발생. 다시 시도해주세요.");
           }
