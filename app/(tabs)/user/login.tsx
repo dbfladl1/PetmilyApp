@@ -40,6 +40,8 @@ export const LoginScreen = () => {
           setIsAutoLogin(true);
           const res: ApiResult = await submitRefreshToken({ refreshToken });
           await apiProcess(res, autoLogin);
+        } else {
+          return;
         }
       } catch (error) {
         alertDialog("자동 로그인 실패");
@@ -54,8 +56,8 @@ export const LoginScreen = () => {
   const setUserAuth = async (res: ApiSuccess) => {
     const token = res.response.data.token;
     const headers = res.response.headers;
+    await TokenStorage.set("access", token);
     if (isAutoLogin === true) {
-      await TokenStorage.set("access", token);
       const setCookieHeader = headers["set-cookie"];
       if (setCookieHeader && setCookieHeader.length > 0) {
         const autoAuthRefreshToken = setCookieHeader
@@ -63,10 +65,7 @@ export const LoginScreen = () => {
           ?.match(/refreshToken=([^;]*)/)?.[1];
 
         autoAuthRefreshToken &&
-          (await SecureStore.setItemAsync(
-            "refreshToken",
-            autoAuthRefreshToken
-          ));
+          (await TokenStorage.set("refresh", autoAuthRefreshToken));
       }
     } else {
       await TokenStorage.remove("refresh");

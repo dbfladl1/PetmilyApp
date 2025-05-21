@@ -15,8 +15,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   async (config) => {
-    const token = TokenStorage.get("access");
-    console.log("TOKEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!S",token)
+    const token = await TokenStorage.get("access");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -83,7 +82,7 @@ export class ApiService {
 }
 
 function handleAxiosError(error: unknown): ApiResult {
-  console.log(error)
+  console.log(error);
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? -1;
     console.log("🔴 fialed api request");
