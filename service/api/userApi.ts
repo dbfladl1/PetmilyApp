@@ -3,30 +3,14 @@ import { ApiService } from "./ApiService";
 import { apiClient } from "./apiClient";
 
 export const checkUserInfo = async () => {
-  try {
-    const response = await apiClient.get(`/api/v1/member`);
-    return response.data;
-  } catch (error: unknown) {
-    throw error;
-  }
+  const response = await ApiService.get(`/api/v1/member`);
+  return response;
 };
 
 export const checkIdDupicate = async (userId: string) => {
   const response = await ApiService.get(`/api/v1/member/check-id/${userId}`);
 
   return response;
-};
-
-export const putMemberProfileImg = async (file: FormData) => {
-  try {
-    const response = await apiClient.put(`/api/v1/member/image`);
-
-    return response.status;
-  } catch (error) {
-    console.error("Error during API call:", error);
-
-    throw error;
-  }
 };
 
 export const sendAuthCodeToEmail = async (data: { email: string }) => {
@@ -75,34 +59,28 @@ export const modifyUser = async (user: modifyUserInfo) => {
   return response;
 };
 
-export const profileUpdate = async (imageUri: string) => {
-  try {
-    const formData = new FormData();
+export const profileImgUpdate = async (imageUri: string) => {
+  const formData = new FormData();
 
-    const normalizedUri = imageUri.startsWith("file://")
-      ? imageUri
-      : `file://${imageUri}`;
-    const fileName = normalizedUri.split("/").pop();
-    const fileType = `image/${fileName?.split(".").pop()}`;
+  const normalizedUri = imageUri.startsWith("file://")
+    ? imageUri
+    : `file://${imageUri}`;
+  const fileName = normalizedUri.split("/").pop();
+  const fileType = `image/${fileName?.split(".").pop()}`;
 
-    formData.append("file", {
-      uri: normalizedUri,
-      name: fileName,
-      type: fileType,
-    } as any);
-    const response = await apiClient.put("/api/v1/member/image", formData, {
-      headers: {
-        Accept: "*/*",
-        "Content-Type": "multipart/form-data",
-      },
-      transformRequest: (data) => {
-        return data;
-      },
-    });
-    return response;
-  } catch (error) {
-    console.error(error);
-
-    throw error;
-  }
+  formData.append("file", {
+    uri: normalizedUri,
+    name: fileName,
+    type: fileType,
+  } as any);
+  const response = await ApiService.put("/api/v1/member/image", formData, {
+    headers: {
+      Accept: "*/*",
+      "Content-Type": "multipart/form-data",
+    },
+    transformRequest: (data) => {
+      return data;
+    },
+  });
+  return response;
 };

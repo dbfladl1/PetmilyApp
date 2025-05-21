@@ -5,8 +5,9 @@ import { getUserInfo } from "@/service/api/userApi";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
-import * as SecureStore from "expo-secure-store";
-import { removeAccessToken } from "@/src/utils/useAuth";
+import { TokenStorage } from "@/src/utils/useAuth";
+import { apiProcess } from "@/src/utils/clientResHandler";
+import { ApiResult } from "@/interface/api";
 
 export default function ModifyMain() {
   const [user, setUser] = useState<{
@@ -14,25 +15,26 @@ export default function ModifyMain() {
     profilePicturePath: string;
   }>({ loginId: "", profilePicturePath: "" });
 
-  const logout = () => {
-    removeAccessToken();
-    SecureStore.deleteItemAsync("refreshToken");
-    router.push("/user/login");
-  }
+  const fetchUserInfo = async () => {
+    const res: ApiResult = await getUserInfo();
+    apiProcess(res, async (res) => {
+      const user = res.response.data;
+      setUser((prev) => Object.assign({}, prev, user));
+    });
+  };
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      const user = await getUserInfo();
-      setUser((prev) => Object.assign({}, prev, user));
-    };
-
     fetchUserInfo();
   }, []);
+
+  const logout = () => {
+    TokenStorage.clearAll();
+    router.push("/user/login");
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View>
-        <Header />
-      </View>
+      <Header />
       <View style={styles.container}>
         <Text style={styles.title}>계정 관리</Text>
         <View style={styles.profileContainer}>
@@ -84,9 +86,7 @@ export default function ModifyMain() {
           </TouchableOpacity>
         </View>
       </View>
-      <View>
-        <BottomNav />
-      </View>
+      <BottomNav />
     </View>
   );
 }

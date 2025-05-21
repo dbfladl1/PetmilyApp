@@ -11,14 +11,12 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { alertDialog } from "@/components/atom/Alert";
-import { useRouter } from "expo-router";
 import { addrType, userInfo } from "@/interface/user";
-import { regEngNumChar, regLowerEngNum } from "@/service/Reg";
 import {
   getUserInfo,
   matchAuth,
   modifyUser,
-  profileUpdate,
+  profileImgUpdate,
   sendAuthCodeToEmail,
 } from "@/service/api/userApi";
 import CText from "@/components/atom/RNText";
@@ -26,39 +24,32 @@ import CTextInput from "@/components/atom/RNInput";
 import CBtn, { CLongBtn } from "@/components/atom/RNTouchableOpacity";
 import CPicker from "@/components/atom/RNPicker";
 import { Picker } from "@react-native-picker/picker";
-import SearchAddrView from "@/components/ui/SearchAddr";
 import Header from "@/components/ui/Header";
 import BottomNav from "@/components/ui/BottomNav";
 import * as ImagePicker from "expo-image-picker";
+import { ApiResult } from "@/interface/api";
+import { apiProcess } from "@/src/utils/clientResHandler";
+
+const vacantUser: userInfo = {
+  email: "",
+  emailVal: true,
+  gender: "",
+  joinDate: "",
+  loginId: "",
+  phone: "",
+  profilePicturePath: "",
+};
 
 export default function ModifyInfo() {
-  const [user, setUser] = useState<userInfo>({
-    email: "",
-    emailVal: true,
-    gender: "",
-    joinDate: "",
-    loginId: "",
-    phone: "",
-    profilePicturePath: "",
-  });
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const user = await getUserInfo();
-      setUser((prev) => Object.assign({}, prev, user));
-    };
-
-    fetchUserInfo();
-  }, []);
-
-  function updateUserField(field: keyof userInfo, value: string) {
-    setUser((prev) => ({ ...prev, [field]: value }));
-  }
-
+  const [user, setUser] = useState<userInfo>(vacantUser);
   const [emailLocal, setEmailLocal] = useState("");
   const [emailDomain, setEmailDomain] = useState("gmail.com");
   const [customDomain, setCustomDomain] = useState("");
   const [sendAuth, setSendAuth] = useState(false);
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
 
   useEffect(() => {
     if (user.email) {
@@ -68,7 +59,22 @@ export default function ModifyInfo() {
     }
   }, [user.email]);
 
-  async function emailAuthHandler() {
+  async function fetchUserInfo() {
+    const res: ApiResult = await getUserInfo();
+    await apiProcess(res, async (res) => {
+      return setUser((prev) => Object.assign({}, prev, res.response.data));
+    });
+  }
+
+  const onEmailAuthSuccess = async () => {
+    setSendAuth(true);
+    return alertDialog(
+      "인증번호를 전송했습니다",
+      "인증번호는 3분간 유효합니다"
+    );
+  };
+
+  const emailAuthHandler = async () => {
     if (emailLocal === "") {
       return alertDialog("아이디를 입력해주세요");
     }
@@ -79,16 +85,9 @@ export default function ModifyInfo() {
 
     setUser((prev) => ({ ...prev, email }));
 
-    const response = await sendAuthCodeToEmail({ email });
-    if (response !== 200) {
-      return alertDialog("인증번호 발송에 실패했습니다");
-    }
-    setSendAuth(true);
-    return alertDialog(
-      "인증번호를 전송했습니다",
-      "인증번호는 3분간 유효합니다"
-    );
-  }
+    const res = await sendAuthCodeToEmail({ email });
+    apiProcess(res, onEmailAuthSuccess);
+  };
 
   const [authCode, setAuthCode] = useState("");
 
@@ -99,13 +98,13 @@ export default function ModifyInfo() {
     if (authCode === "") {
       return alertDialog("인증번호를 입력해주세요");
     }
-    const response = await matchAuth({ email: user.email, authCode });
-    if (response !== 200) {
-      return alertDialog("메일 인증 중 문제가 발생했습니다.");
-    }
-    setUser((prev) => ({ ...prev, emailVal: true }));
-    return alertDialog("인증이 완료되었습니다.");
+    const res = await matchAuth({ email: user.email, authCode });
+    apiProcess(res, async () => {
+      setUser((prev) => ({ ...prev, emailVal: true }));
+      return alertDialog("인증이 완료되었습니다.");
+    });
   }
+
   const selectProfile = () => {
     Alert.alert(
       "프로필 사진",
@@ -124,7 +123,7 @@ export default function ModifyInfo() {
         //       profilePicturePath: "",
         //     }));
 
-        //     profileModify("");
+        //     updateProfileImg("");
         //   },
         // },
         {
@@ -136,13 +135,11 @@ export default function ModifyInfo() {
     );
   };
 
-  async function profileModify(imgUri: string) {
-    const result = await profileUpdate(imgUri);
-    if (result.status === 200) {
-      alertDialog("변경되었습니다.");
-    } else {
-      alertDialog("회원정보 변경에 실패했습니다.");
-    }
+  async function updateProfileImg(imgUri: string) {
+    const res = await profileImgUpdate(imgUri);
+    await apiProcess(res, async () => {
+      return alertDialog("변경되었습니다.");
+    });
   }
 
   const openGallery = async () => {
@@ -155,7 +152,7 @@ export default function ModifyInfo() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsMultipleSelection: false,
-      quality: 1,
+      quality: 0.5,
     });
 
     if (result.canceled) {
@@ -163,7 +160,7 @@ export default function ModifyInfo() {
     } else {
       const imgUri = result.assets[0].uri;
       setUser((prev) => ({ ...prev, profilePicturePath: imgUri }));
-      profileModify(imgUri);
+      updateProfileImg(imgUri);
     }
   };
   const [addr, setAddr] = useState<addrType>({
@@ -172,13 +169,13 @@ export default function ModifyInfo() {
     postcode: "",
   });
 
-  const inputAdress = (data: { zonecode: string; address: string }) => {
-    setAddr((prev) => ({
-      ...prev,
-      address: data.address,
-      postcode: data.zonecode,
-    }));
-  };
+  // const inputAdress = (data: { zonecode: string; address: string }) => {
+  //   setAddr((prev) => ({
+  //     ...prev,
+  //     address: data.address,
+  //     postcode: data.zonecode,
+  //   }));
+  // };
 
   const openSearchAddr = (state: boolean) => {
     try {
@@ -194,12 +191,14 @@ export default function ModifyInfo() {
       phone: user.phone,
       gender: user.gender,
     };
-    const result = await modifyUser(modifiedInfo);
-    if (result.status === 200) {
-      alertDialog("변경되었습니다.");
-    } else {
-      alertDialog("회원정보 변경에 실패했습니다.");
-    }
+    const res = await modifyUser(modifiedInfo);
+    await apiProcess(res, async () => {
+      alertDialog("회원정보가 변경되었습니다");
+    });
+  }
+
+  function updateUserField(field: keyof userInfo, value: string) {
+    setUser((prev) => ({ ...prev, [field]: value }));
   }
 
   return (
