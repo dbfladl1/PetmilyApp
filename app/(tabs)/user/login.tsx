@@ -3,19 +3,21 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ActivityIndicator, Image } from "react-native";
 import CText from "@/components/atom/RNText";
 import CTextInput from "@/components/atom/RNInput";
-import { login, submitRefreshToken, testLogin } from "@/service/api/userApi";
+import { login, submitRefreshToken } from "@/service/api/userApi";
 import { loginInfo } from "@/interface/user";
 import { CLongBtn } from "@/components/atom/RNTouchableOpacity";
 import { useRouter } from "expo-router";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { alertDialog } from "@/components/atom/Alert";
 import * as SecureStore from "expo-secure-store";
-import { getAccessToken, setAccessToken } from "@/src/utils/useAuth";
-import LoadingWrapper from "@/components/Loadingwrapper";
-import { handleCommonApiError } from "@/src/utils/clientErrorHandler";
+import { apiProcess } from "@/src/utils/clientResHandler";
+import { ApiResult, ApiSuccess } from "@/interface/api";
+import { TokenStorage } from "@/src/utils/useAuth";
 
-export const LoginScreen=()=> {
-  const [autoLogin, setAutoLogin] = useState(false);
+export const LoginScreen = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [isAutoLogin, setIsAutoLogin] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState({ loginId: "", password: "" });
 
@@ -23,25 +25,24 @@ export const LoginScreen=()=> {
     setUser((prev) => ({ ...prev, [field]: value }));
   }
 
+  const autoLogin = async (res: ApiSuccess) => {
+    const token = res.response.data.token;
+    await TokenStorage.set("access", token);
+    router.replace("/sns/snsFeed");
+  };
+
   useEffect(() => {
     const checkAutoLogin = async () => {
       try {
-        const refreshToken = await SecureStore.getItemAsync("refreshToken");
+        const refreshToken = await TokenStorage.get("refresh");
 
         if (refreshToken !== null) {
-          setAutoLogin(true);
-          const res = await submitRefreshToken({ refreshToken });
-          if (!res.success) {
-            const { status } = res;
-            handleCommonApiError(status, "login");
-            return;
-          }
-          const token = res.response.data.token;
-          await setAccessToken(token);
-          router.replace("/sns/snsFeed");
+          setIsAutoLogin(true);
+          const res: ApiResult = await submitRefreshToken({ refreshToken });
+          await apiProcess(res, autoLogin);
         }
       } catch (error) {
-        alertDialog("로그인 실패");
+        alertDialog("자동 로그인 실패");
       } finally {
         setIsLoading(false);
       }
@@ -50,115 +51,103 @@ export const LoginScreen=()=> {
     checkAutoLogin();
   }, []);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const setUserAuth = async (res: ApiSuccess) => {
+    const token = res.response.data.token;
+    const headers = res.response.headers;
+    if (isAutoLogin === true) {
+      await TokenStorage.set("access", token);
+      const setCookieHeader = headers["set-cookie"];
+      if (setCookieHeader && setCookieHeader.length > 0) {
+        const autoAuthRefreshToken = setCookieHeader
+          .find((cookie: string) => /refreshToken=([^;]*)/.test(cookie))
+          ?.match(/refreshToken=([^;]*)/)?.[1];
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
+        autoAuthRefreshToken &&
+          (await SecureStore.setItemAsync(
+            "refreshToken",
+            autoAuthRefreshToken
+          ));
+      }
+    } else {
+      await TokenStorage.remove("refresh");
+    }
+    router.replace("/sns/snsFeed");
+  };
 
   const handleLogin = async () => {
     const res = await login(user);
-    if (!res.success) {
-      const { status, message } = res;
-      handleCommonApiError(status, message);
-      return;
-    }
-    if (res.success) {
-      const token = res.response.data.token;
-      const headers = res.response.headers;
-      if (autoLogin === true) {
-        await setAccessToken(token);
-        const setCookieHeader = headers["set-cookie"];
-        if (setCookieHeader && setCookieHeader.length > 0) {
-          const autoAuthRefreshToken = setCookieHeader
-            .find((cookie: string) => /refreshToken=([^;]*)/.test(cookie))
-            ?.match(/refreshToken=([^;]*)/)?.[1];
-
-          autoAuthRefreshToken &&
-            (await SecureStore.setItemAsync(
-              "refreshToken",
-              autoAuthRefreshToken
-            ));
-        }
-      } else {
-        setAccessToken(token);
-        await SecureStore.deleteItemAsync("refreshToken");
-      }
-      router.replace("/sns/snsFeed");
-    }
+    apiProcess(res, setUserAuth);
   };
 
-  return (
-    <LoadingWrapper isLoading={isLoading}>
-      <View style={styles.container}>
-        <Image
-          source={require("@/assets/images/pm-logo.png")}
-          style={styles.logo}
-        />
+  return isLoading ? (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#0000ff" />
+    </View>
+  ) : (
+    <View style={styles.container}>
+      <Image
+        source={require("@/assets/images/pm-logo.png")}
+        style={styles.logo}
+      />
 
-        <CTextInput
-          style={styles.input}
-          placeholder="아이디"
-          placeholderTextColor="#A0A0A0"
-          onChangeText={(id) => {
-            updateUserField("loginId", id);
-          }}
-        />
+      <CTextInput
+        style={styles.input}
+        placeholder="아이디"
+        placeholderTextColor="#A0A0A0"
+        onChangeText={(id) => {
+          updateUserField("loginId", id);
+        }}
+      />
 
-        <CTextInput
-          style={styles.input}
-          placeholder="비밀번호"
-          placeholderTextColor="#A0A0A0"
-          secureTextEntry={true}
-          onChangeText={(pw) => {
-            updateUserField("password", pw);
-          }}
-        />
+      <CTextInput
+        style={styles.input}
+        placeholder="비밀번호"
+        placeholderTextColor="#A0A0A0"
+        secureTextEntry={true}
+        onChangeText={(pw) => {
+          updateUserField("password", pw);
+        }}
+      />
 
-        <CLongBtn style={styles.button} onPress={handleLogin}>
-          <CText style={styles.buttonText}>로그인</CText>
-        </CLongBtn>
+      <CLongBtn style={styles.button} onPress={handleLogin}>
+        <CText style={styles.buttonText}>로그인</CText>
+      </CLongBtn>
 
-        <View style={styles.pwJoinLink}>
-          <View style={{ flex: 1 }}>
-            <BouncyCheckbox
-              size={20}
-              text="자동 로그인"
-              fillColor="#7D3DCF"
-              isChecked={autoLogin}
-              onPress={() => setAutoLogin((prev) => !prev)}
-              textStyle={{
-                textDecorationLine: "none",
-                flex: 1,
-                minHeight: 24,
-              }}
-            />
-          </View>
-          <View
-            style={{
-              display: "flex",
+      <View style={styles.pwJoinLink}>
+        <View style={{ flex: 1 }}>
+          <BouncyCheckbox
+            size={20}
+            text="자동 로그인"
+            fillColor="#7D3DCF"
+            isChecked={isAutoLogin}
+            onPress={() => setIsAutoLogin((prev) => !prev)}
+            textStyle={{
+              textDecorationLine: "none",
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "flex-end",
+              minHeight: 24,
             }}
-          >
-            <Link href="/user/findPw" style={styles.linkText}>
-              비밀번호 찾기
-            </Link>
-            <CText style={styles.divider}> / </CText>
-            <Link href="/user/join" style={styles.linkText}>
-              회원가입
-            </Link>
-          </View>
+          />
+        </View>
+        <View
+          style={{
+            display: "flex",
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Link href="/user/findPw" style={styles.linkText}>
+            비밀번호 찾기
+          </Link>
+          <CText style={styles.divider}> / </CText>
+          <Link href="/user/join" style={styles.linkText}>
+            회원가입
+          </Link>
         </View>
       </View>
-    </LoadingWrapper>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

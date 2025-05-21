@@ -21,28 +21,32 @@ import {
   matchAuth,
   sendAuthCodeToEmail,
 } from "@/service/api/userApi";
-import { regEngNumChar, regLowerEngNum } from "@/service/Reg";
 import { alertDialog } from "@/components/atom/Alert";
 import { addrType, userForm } from "@/interface/user";
 import { useRouter } from "expo-router";
+import { regEngNumChar, regLowerEngNum } from "@/src/utils/Reg";
+import { apiProcess } from "@/src/utils/clientResHandler";
+import { ApiSuccess } from "@/interface/api";
+
+const vacantUser: userForm = {
+  id: "",
+  idVal: false,
+  pw: "",
+  pwChk: false,
+  pwMatch: "",
+  isPwMatch: false,
+  gender: "F",
+  phone: "",
+  email: "",
+  emailVal: false,
+  profile: "",
+  address: "",
+  term: false,
+};
 
 export default function JoinScreen() {
   const router = useRouter();
-  const [user, setUser] = useState<userForm>({
-    id: "",
-    idVal: false,
-    pw: "",
-    pwChk: false,
-    pwMatch: "",
-    isPwMatch: false,
-    gender: "F",
-    phone: "",
-    email: "",
-    emailVal: false,
-    profile: "",
-    address: "",
-    term: false,
-  });
+  const [user, setUser] = useState<userForm>(vacantUser);
 
   function updateUserField(field: keyof userForm, value: string) {
     setUser((prev) => ({ ...prev, [field]: value }));
@@ -51,25 +55,24 @@ export default function JoinScreen() {
   function updateCheckField(chkProperty: keyof userForm) {
     setUser((prev) => ({ ...prev, [chkProperty]: false }));
   }
+  const idAvailabilityRes = async (res: ApiSuccess) => {
+    const idCheck = res.response.data.isValidLoginId;
+    if (idCheck) {
+      setUser((prev) => ({ ...prev, idVal: true }));
+      return alertDialog("아이디를 사용하실 수 있습니다.");
+    } else {
+      return alertDialog("이미 사용 중인 아이디입니다.");
+    }
+  };
 
-  async function checkIdAvailability() {
+  const checkIdAvailability = async () => {
     if (!regLowerEngNum(user.id)) {
       return alertDialog("아이디 형식을 확인해주세요");
     }
 
-    try {
-      const isAvailable = await checkIdDupicate(user.id);
-  
-      if (isAvailable) {
-        setUser((prev) => ({ ...prev, idVal: true }));
-        return alertDialog("아이디를 사용하실 수 있습니다.");
-      } else {
-        return alertDialog("이미 사용 중인 아이디입니다."); // 조건 false인 경우
-      }
-    } catch (error) {
-      return alertDialog("아이디를 조회 중 오류가 발생했습니다."); // 네트워크 오류 등
-    }
-  }
+    const res = await checkIdDupicate(user.id);
+    apiProcess(res, idAvailabilityRes);
+  };
 
   function isPwAvailability(value: string) {
     const pwRes = regEngNumChar(value);
@@ -89,6 +92,14 @@ export default function JoinScreen() {
   const [customDomain, setCustomDomain] = useState("");
   const [sendAuth, setSendAuth] = useState(false);
 
+  const onEmailAuthSuccess  = async () => {
+    setSendAuth(true);
+    return alertDialog(
+      "인증번호를 전송했습니다",
+      "인증번호는 3분간 유효합니다"
+    );
+  };
+
   async function emailAuthHandler() {
     if (emailLocal === "") {
       return alertDialog("아이디를 입력해주세요");
@@ -100,15 +111,8 @@ export default function JoinScreen() {
 
     setUser((prev) => ({ ...prev, email }));
 
-    const response = await sendAuthCodeToEmail({ email });
-    if (response !== 200) {
-      return alertDialog("인증번호 발송에 실패했습니다");
-    }
-    setSendAuth(true);
-    return alertDialog(
-      "인증번호를 전송했습니다",
-      "인증번호는 3분간 유효합니다"
-    );
+    const res = await sendAuthCodeToEmail({ email });
+    apiProcess(res, onEmailAuthSuccess );
   }
 
   const [authCode, setAuthCode] = useState("");
@@ -120,15 +124,13 @@ export default function JoinScreen() {
     if (authCode === "") {
       return alertDialog("인증번호를 입력해주세요");
     }
-    const response = await matchAuth({ email: user.email, authCode });
-    if (response !== 200) {
-      return alertDialog("메일 인증 중 문제가 발생했습니다.");
-    }
-    console.log(response);
-    setUser((prev) => ({ ...prev, emailVal: true }));
-    return alertDialog("인증이 완료되었습니다.");
-  }
 
+    const res = await matchAuth({ email: user.email, authCode });
+    apiProcess(res, async () => {
+      setUser((prev) => ({ ...prev, emailVal: true }));
+      return alertDialog("인증이 완료되었습니다.");
+    });
+  }
 
   const [addr, setAddr] = useState<addrType>({
     state: false,
@@ -164,13 +166,11 @@ export default function JoinScreen() {
         recoveryQuestion: "",
         recoveryAnswer: "",
       };
-      const result = await joinUser(data);
-      if (result) {
+      const res = await joinUser(data);
+      apiProcess(res, async () => {
         alertDialog("회원가입이 완료되었습니다.");
-        router.push("/user/login");
-      } else {
-        alertDialog("회원가입 중 에러가 발생했습니다.");
-      }
+        router.push("/");
+      });
     }
   }
 
@@ -187,8 +187,8 @@ export default function JoinScreen() {
       if (!validation.condition) {
         return alertDialog(validation.message);
       }
-      return true;
     }
+    return true;
   }
 
   return (
@@ -225,7 +225,6 @@ export default function JoinScreen() {
             </CBtn>
           </View>
         </View>
-
         <View>
           <CText style={styles.label}>* 비밀번호</CText>
           <CText style={styles.smallText}>

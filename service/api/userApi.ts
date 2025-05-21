@@ -1,28 +1,20 @@
 import { modifyUserInfo } from "@/interface/user";
-import apiClient from "./apiClient";
+import { ApiService } from "./ApiService";
+import { apiClient } from "./apiClient";
 
 export const checkUserInfo = async () => {
   try {
     const response = await apiClient.get(`/api/v1/member`);
-console.log(response.data)
     return response.data;
-  } catch (error) {
-    console.error("Error during API call:", error);
-
+  } catch (error: unknown) {
     throw error;
   }
 };
 
 export const checkIdDupicate = async (userId: string) => {
-  try {
-    const response = await apiClient.get(`/api/v1/member/check-id/${userId}`);
-
-    return response.status;
-  } catch (error) {
-    console.error("Error during API call:", error);
-
-    throw error;
-  }
+  const response = await ApiService.get(`/api/v1/member/check-id/${userId}`);
+  
+  return response;
 };
 
 export const putMemberProfileImg = async (file: FormData) => {
@@ -38,109 +30,49 @@ export const putMemberProfileImg = async (file: FormData) => {
 };
 
 export const sendAuthCodeToEmail = async (data: { email: string }) => {
-  try {
-    const response = await apiClient.post(
-      "/api/v1/member/email-auth/send-code",
-      data
-    );
-    
-    return response.status;
-  } catch (error) {
-    console.error("Error during API call:", error);
+  const response = ApiService.post("/api/v1/member/email-auth/send-code", data);
 
-    throw error;
-  }
+  return response;
 };
 
 export const matchAuth = async (data: { email: string; authCode: string }) => {
-  try {
-    const response = await apiClient.post(
-      "/api/v1/member/email-auth/verify-code",
-      data
-    );
-
-    return response.status;
-  } catch (error) {
-    console.error("Error during API call:", error);
-
-    throw error;
-  }
+  const response = ApiService.post(
+    "/api/v1/member/email-auth/verify-code",
+    data
+  );
+  return response;
 };
 
 export const joinUser = async (data: {
   loginId: string;
   password: string;
   email: string;
-  phone: string;
+  phone?: string;
+  address?: string;
   gender: string;
-  recoveryQuestion: string;
-  recoveryAnswer: string;
 }) => {
-  try {
-    const response = await apiClient.post(`/api/v1/member/register`, data);
-    return response;
-  } catch (error) {
-    console.log("err", error);
-  }
+  const response = ApiService.post(`/api/v1/member/register`, data);
+  return response;
 };
 
 export const login = async (data: { loginId: string; password: string }) => {
-  try {
-    const response = await apiClient.post(`/api/v1/member/login`, data);
-    return response;
-  } catch (error) {
-    console.log("err", error);
-  }
+  const response = await ApiService.post("/api/v1/member/login", data);
+  return response;
 };
 
 export const submitRefreshToken = async (data: { refreshToken: string }) => {
-  try {
-    const response = await apiClient.post("/api/v1/member/token/refresh", data);
-    return response.data;
-  } catch (error) {
-    console.error("Error during API call:", error);
-
-    throw error;
-  }
-};
-export const testLogin = async (data: {
-  loginId: string;
-  password: string;
-}) => {
-  try {
-    const response = await apiClient.post(
-      `/api/v1/member/login/expiretoken`,
-      data
-    );
-    return response;
-  } catch (error) {
-    console.error("Error during API call:", error);
-    throw error;
-  }
+  const response = await ApiService.post("/api/v1/member/token/refresh", data);
+  return response;
 };
 
 export const getUserInfo = async () => {
-  try {
-    const response = await apiClient.get("/api/v1/member");
-
-    return response.data;
-  } catch (error) {
-    console.error("Error during API call:", error);
-
-    throw error;
-  }
+  const response = await ApiService.get("/api/v1/member");
+  return response;
 };
 
 export const modifyUser = async (user: modifyUserInfo) => {
-  console.log("respne!!!",user);
-  try {
-    const response = await apiClient.put("/api/v1/member", user);
-    console.log("respne!!!",response);
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  const response = ApiService.put("/api/v1/member", user);
+  return response;
 };
 
 export const profileUpdate = async (imageUri: string) => {
