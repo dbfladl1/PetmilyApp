@@ -1,13 +1,27 @@
 import * as SecureStore from "expo-secure-store";
 
-export const setAccessToken = async (token: string) => {
-  await SecureStore.setItemAsync("accessToken", token);
-};
+export class TokenStorage {
+  static keys = {
+    access: "accessToken",
+    refresh: "refreshToken",
+  };
 
-export const getAccessToken = async (): Promise<string | null> => {
-  return await SecureStore.getItemAsync("accessToken");
-};
+  static async set(type: "access" | "refresh", token: string) {
+    await SecureStore.setItemAsync(this.keys[type], token);
+  }
 
-export const removeAccessToken = async () => {
-  await SecureStore.deleteItemAsync("accessToken");
-};
+  static async get(type: "access" | "refresh"): Promise<string | null> {
+    return await SecureStore.getItemAsync(this.keys[type]);
+  }
+
+  static async remove(type: "access" | "refresh") {
+    await SecureStore.deleteItemAsync(this.keys[type]);
+  }
+
+  static async clearAll() {
+    await Promise.all([
+      SecureStore.deleteItemAsync(this.keys.access),
+      SecureStore.deleteItemAsync(this.keys.refresh),
+    ]);
+  }
+}

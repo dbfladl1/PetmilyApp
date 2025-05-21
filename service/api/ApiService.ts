@@ -1,4 +1,4 @@
-import { getAccessToken } from "@/src/utils/useAuth";
+import { TokenStorage } from "@/src/utils/useAuth";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 type ApiSuccess = { success: true; response: AxiosResponse };
@@ -15,7 +15,8 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   async (config) => {
-    const token = await getAccessToken();
+    const token = TokenStorage.get("access");
+    console.log("TOKEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!S",token)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -82,6 +83,7 @@ export class ApiService {
 }
 
 function handleAxiosError(error: unknown): ApiResult {
+  console.log(error)
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? -1;
     console.log("🔴 fialed api request");
