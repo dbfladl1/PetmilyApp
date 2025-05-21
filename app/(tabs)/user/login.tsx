@@ -16,10 +16,14 @@ import { TokenStorage } from "@/src/utils/useAuth";
 
 export const LoginScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
-
   const [isAutoLogin, setIsAutoLogin] = useState(false);
-  const router = useRouter();
   const [user, setUser] = useState({ loginId: "", password: "" });
+
+  const router = useRouter();
+
+  useEffect(() => {
+    checkAutoLogin();
+  }, []);
 
   function updateUserField(field: keyof loginInfo, value: string) {
     setUser((prev) => ({ ...prev, [field]: value }));
@@ -31,27 +35,23 @@ export const LoginScreen = () => {
     router.replace("/sns/snsFeed");
   };
 
-  useEffect(() => {
-    const checkAutoLogin = async () => {
-      try {
-        const refreshToken = await TokenStorage.get("refresh");
+  async function checkAutoLogin() {
+    try {
+      const refreshToken = await TokenStorage.get("refresh");
 
-        if (refreshToken !== null) {
-          setIsAutoLogin(true);
-          const res: ApiResult = await submitRefreshToken({ refreshToken });
-          await apiProcess(res, autoLogin);
-        } else {
-          return;
-        }
-      } catch (error) {
-        alertDialog("자동 로그인 실패");
-      } finally {
-        setIsLoading(false);
+      if (refreshToken !== null) {
+        setIsAutoLogin(true);
+        const res: ApiResult = await submitRefreshToken({ refreshToken });
+        await apiProcess(res, autoLogin);
+      } else {
+        return;
       }
-    };
-
-    checkAutoLogin();
-  }, []);
+    } catch (error) {
+      alertDialog("자동 로그인 실패");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const setUserAuth = async (res: ApiSuccess) => {
     const token = res.response.data.token;
