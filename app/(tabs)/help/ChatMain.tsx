@@ -7,14 +7,15 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getMyPet } from "@/service/api/chatApi";
-import { useRouter } from "expo-router";
-import { petInfo, addedPetInfo } from "@/interface/chat";
+import { addedPetInfo } from "@/interface/chat";
 import { StyleSheet } from "react-native";
 import AddPet from "../../../components/features/AddPet";
 import ChatAi from "../../../components/features/ChatAI";
 import BottomNav from "@/components/ui/BottomNav";
 import Header from "@/components/ui/Header";
 import Pannel from "@/components/atom/Pannel";
+import { apiProcess } from "@/src/utils/clientResHandler";
+import { ApiSuccess } from "@/interface/api";
 
 export default function ChatMain() {
   const [petInfo, setPetInfo] = useState<addedPetInfo[]>([]);
@@ -25,24 +26,25 @@ export default function ChatMain() {
 
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
-  async function fetchPetInfo () {
-    try {
-      const res = await getMyPet();
-      if (res.animalInfos.length === 0) {
-        setChatType("add");
-      } else {
-        setPetInfo(res.animalInfos);
-        setSelectedPet(res.animalInfos[0]);
-        setChatType("chat");
-      }
-    } catch (error) {
-      console.error("❌ 반려동물 정보 가져오기 실패:", error);
-    }
-  };
-
   useEffect(() => {
     fetchPetInfo();
   }, []);
+
+  const fetchPetList = async (res: ApiSuccess) => {
+    const petList = res.response.data.animalInfos;
+    if (petList.length === 0) {
+      setChatType("add");
+    } else {
+      setPetInfo(petList);
+      setSelectedPet(petList[0]);
+      setChatType("chat");
+    }
+  };
+
+  async function fetchPetInfo() {
+    const res = await getMyPet();
+    apiProcess(res, fetchPetList);
+  }
 
   const settingPetInfo = (pet: addedPetInfo) => {
     setSelectedPet(pet);

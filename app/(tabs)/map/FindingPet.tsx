@@ -43,10 +43,6 @@ export default function FindingPetScreen() {
     fetchLocation();
   }, []);
 
-  useEffect(() => {
-    console.log(location);
-  }, [location]);
-
   return (
     <View style={{ flex: 1 }}>
       <Header />

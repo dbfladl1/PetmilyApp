@@ -78,7 +78,6 @@ export default function ChatAi({
   }) => {
     setTimeout(() => setIsTyping(true), 300);
     let newFlow = chatFlow;
-    console.log("answerInfo", answerInfo);
     let isHandledByRule = true;
 
     if (answerInfo.step === 0) {

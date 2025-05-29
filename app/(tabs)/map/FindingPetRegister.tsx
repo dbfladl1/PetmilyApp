@@ -36,7 +36,6 @@ export default function FindingPetRegister() {
 
   const getAddressFromCoords = async (latitude: number, longitude: number) => {
     try {
-      console.log("📍 [DEBUG] 좌표 -> 주소 변환 요청:", latitude, longitude);
   
       const response = await axios.get(
         `https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc`,

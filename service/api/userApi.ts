@@ -1,6 +1,5 @@
 import { modifyUserInfo } from "@/interface/user";
 import { ApiService } from "./ApiService";
-import { apiClient } from "./apiClient";
 
 export const checkUserInfo = async () => {
   const response = await ApiService.get(`/api/v1/member`);
@@ -14,13 +13,13 @@ export const checkIdDupicate = async (userId: string) => {
 };
 
 export const sendAuthCodeToEmail = async (data: { email: string }) => {
-  const response = ApiService.post("/api/v1/member/email-auth/send-code", data);
+  const response =await ApiService.post("/api/v1/member/email-auth/send-code", data);
 
   return response;
 };
 
 export const matchAuth = async (data: { email: string; authCode: string }) => {
-  const response = ApiService.post(
+  const response =await ApiService.post(
     "/api/v1/member/email-auth/verify-code",
     data
   );
@@ -54,8 +53,9 @@ export const getUserInfo = async () => {
   return response;
 };
 
-export const modifyUser = async (user: modifyUserInfo) => {
-  const response = ApiService.put("/api/v1/member", user);
+export const modifyUser = async (updateMember : modifyUserInfo) => {
+  const response =await ApiService.put("/api/v1/member", updateMember );
+  console.log(updateMember )
   return response;
 };
 

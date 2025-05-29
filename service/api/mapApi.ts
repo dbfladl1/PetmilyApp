@@ -46,7 +46,6 @@ export const searchPlaces = async (
 ) => {
   try {
     const address = await getAddressFromCoords(latitude, longitude);
-    console.log("쿠ㅓ리확인", latitude,longitude)
     const searchQuery = address ? `${query} ${address}` : query;
 
     const response = await axios.get(

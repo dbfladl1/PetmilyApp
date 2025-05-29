@@ -39,5 +39,4 @@ export interface userInfo {
 export interface modifyUserInfo {
   email:string,
   phone: string,
-  gender: string,
 }

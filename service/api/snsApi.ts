@@ -1,4 +1,3 @@
-import { apiClient } from "./apiClient";
 import { ApiService } from "./ApiService";
 
 export const loadAllFeedContents = async () => {

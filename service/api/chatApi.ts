@@ -1,31 +1,20 @@
 import axios from "axios";
-import apiClient from "./apiClient";
 import { petInfo } from "@/interface/chat";
 import Constants from "expo-constants";
+import { ApiService } from "./ApiService";
 
 const extra = Constants.expoConfig?.extra || {};
 
 export const getMyPet = async () => {
-  try {
-    const response = await apiClient.get("/api/v1/animal");
-    return response.data;
-  } catch (error) {
-    console.error("Error during API call:", error);
-    throw error;
-  }
+  const response = await ApiService.get("/api/v1/animal");
+
+  return response;
 };
 
 export const enrolledMypet = async (pet: petInfo) => {
-  try {
-    const response = await apiClient.post(`/api/v1/animal`, pet);
+  const response = await ApiService.post(`/api/v1/animal`, pet);
 
-    console.log(response);
-
-    return response.status;
-  } catch (error) {
-    console.error("Error during API call:", error);
-    throw error;
-  }
+  return response;
 };
 
 export const getAnswer = async () => {};

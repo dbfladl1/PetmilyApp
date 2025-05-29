@@ -12,7 +12,6 @@ import RNTouchableOpacity from "./RNTouchableOpacity";
 import { Place } from "@/interface/map";
 
 export default function InfoLayer({ place, closeLayer }: { place: Place, closeLayer: () => void }) {
-  console.log(place)
     const handlePress = (type: "phone" | "link", value: string) => {
     if (type === "phone") {
       Linking.openURL(`tel:${value}`); 

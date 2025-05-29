@@ -24,10 +24,6 @@ export default function Pannel({
   onOpen: () => void;
   isOpen: boolean;
 }) {
-  useEffect(() => {
-    console.log("🔄 isOpen changed:", isOpen);
-  }, [isOpen]);
-
   const selectHandler = (pet: any) => {
     selectHandle(pet);
     onClose();

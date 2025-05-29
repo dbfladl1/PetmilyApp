@@ -59,6 +59,7 @@ export class ApiService {
     config?: AxiosRequestConfig
   ): Promise<ApiResult> {
     try {
+      console.log("data@@",data)
       const response = await apiClient.put<T>(url, data, config);
       return { success: true, response: response };
     } catch (error) {
@@ -91,7 +92,7 @@ function handleAxiosError(error: unknown): ApiResult {
     return {
       success: false,
       status: status,
-      message: error.response?.data.message,
+      message: error.response?.data.message || "서버에서 오류 응답을 반환했습니다.",
     };
   } else {
     console.log("❗ unexpected error:", error);
