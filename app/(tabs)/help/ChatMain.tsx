@@ -6,16 +6,16 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { getMyPet } from "@/service/api/chatApi";
-import { addedPetInfo } from "@/interface/chat";
+import { getMyPet } from "@/src/service/api/chatApi";
+import { addedPetInfo } from "@/src/interface/chat";
 import { StyleSheet } from "react-native";
-import AddPet from "../../../components/features/AddPet";
-import ChatAi from "../../../components/features/ChatAI";
-import BottomNav from "@/components/ui/BottomNav";
-import Header from "@/components/ui/Header";
-import Pannel from "@/components/atom/Pannel";
-import { apiProcess } from "@/src/utils/clientResHandler";
-import { ApiSuccess } from "@/interface/api";
+import AddPet from "../../../src/components/features/AddPet";
+import ChatAi from "../../../src/components/features/ChatAI";
+import BottomNav from "@/src/components/ui/BottomNav";
+import Header from "@/src/components/ui/Header";
+import Pannel from "@/src/components/atom/Pannel";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { ApiSuccess } from "@/src/interface/api";
 
 export default function ChatMain() {
   const [petInfo, setPetInfo] = useState<addedPetInfo[]>([]);

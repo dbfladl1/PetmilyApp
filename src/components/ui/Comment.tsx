@@ -10,24 +10,25 @@ import {
 } from "react-native";
 import CBtn from "../atom/RNTouchableOpacity";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { createComment } from "@/service/api/snsApi";
-import { CommentProps } from "@/interface/post";
-import { alertDialog } from "../atom/Alert";
 import CommentItem from "../atom/CommentItem";
-import { apiProcess } from "@/src/utils/clientResHandler";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { createComment } from "@/src/service/api/snsApi";
+import { snsFeedStore } from "@/src/store/sns/snsFeedStore";
 
-export default function Comment({
-  comments,
-  postId,
-  closeComment,
-  getComment,
-}: CommentProps) {
+export default function Comment() {
   const scrollRef = useRef<ScrollView>(null);
+  const comments = snsFeedStore((s) => s.comments);
+  const fetchSelectedFeedComments = snsFeedStore(
+    (s) => s.fetchSelectedFeedComments
+  );
+  const selectedPostId = snsFeedStore((s) => s.selectedPostId);
+  const closeComment = snsFeedStore((s) => s.closeComment);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       scrollRef.current?.scrollToEnd({ animated: true });
     }, 10);
+    console.log("@@", comments)
 
     return () => clearTimeout(timer);
   }, [comments]);
@@ -93,12 +94,12 @@ export default function Comment({
   } // 패널 숨김 처리
 
   const submitComment = async () => {
-    const res = await createComment(postId, {
+    const res = await createComment(selectedPostId, {
       content,
       parentComentId: "0",
     });
     await apiProcess(res, async () => {
-      getComment();
+      fetchSelectedFeedComments(selectedPostId);
       setContent("");
     });
   };
@@ -117,7 +118,12 @@ export default function Comment({
         </View>
         <ScrollView style={styles.commentBox} ref={scrollRef}>
           {comments.map((comment) => (
-            <CommentItem key={comment.commentId} postId={postId} comment={comment} refresh={getComment} />
+            <CommentItem
+              key={comment.commentId}
+              comment={comment}
+              postId={selectedPostId}
+              refresh={() => fetchSelectedFeedComments(selectedPostId)}
+            />
           ))}
         </ScrollView>
         <View style={styles.typeArea}>

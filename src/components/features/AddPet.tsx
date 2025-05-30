@@ -1,12 +1,12 @@
-import CTextInput from "@/components/atom/RNInput";
-import CBtn from "@/components/atom/RNTouchableOpacity";
-import Chat from "@/components/atom/Chat";
+import CTextInput from "@/src/components/atom/RNInput";
+import CBtn from "@/src/components/atom/RNTouchableOpacity";
+import Chat from "@/src/components/atom/Chat";
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, ScrollView, Keyboard } from "react-native";
-import OptionButton from "@/components/atom/OptionButton";
-import { enrolledMypet, getMyPet } from "@/service/api/chatApi";
+import OptionButton from "@/src/components/atom/OptionButton";
+import { enrolledMypet, getMyPet } from "@/src/service/api/chatApi";
 import { questions } from "@/data/enrolledStep";
-import { addedPetInfo, petInfo } from "@/interface/chat";
+import { addedPetInfo, petInfo } from "@/src/interface/chat";
 
 export default function AddPet() {
   const scrollRef = useRef<ScrollView>(null);

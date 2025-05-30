@@ -1,5 +1,5 @@
-import Header from "@/components/ui/Header";
-import Feed from "@/components/ui/Feed";
+import Header from "@/src/components/ui/Header";
+import Feed from "@/src/components/ui/Feed";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -8,23 +8,22 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import BottomNav from "@/components/ui/BottomNav";
-import Comment from "@/components/ui/Comment";
+import BottomNav from "@/src/components/ui/BottomNav";
+import Comment from "@/src/components/ui/Comment";
 import { useRouter } from "expo-router";
-import {
-  addLike,
-  loadAllFeedContents,
-  loadComment,
-} from "@/service/api/snsApi";
-import { apiProcess } from "@/src/utils/clientResHandler";
-import { ApiSuccess } from "@/interface/api";
-import { feedType } from "@/interface/post";
+import { addLike, loadComment } from "@/src/service/api/snsApi";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { ApiSuccess } from "@/src/interface/api";
+import { snsFeedStore } from "@/src/store/sns/snsFeedStore";
 
 export default function SnsFeedScreen() {
-  const [feeds, setFeeds] = useState<feedType[]>([]);
-
-  const [comment, setComment] = useState({ state: false, list: [] });
-  const [selectedPostId, setSelectedPostId] = useState("");
+  const feeds = snsFeedStore((s) => s.feeds);
+  const fetchFeedData = snsFeedStore((s) => s.fetchFeedData);
+  const updateCount = snsFeedStore((s) => s.updateCount);
+  const fetchSelectedFeedComments = snsFeedStore(
+    (s) => s.fetchSelectedFeedComments
+  );
+  const showComments = snsFeedStore((s) => s.showComments);
 
   const router = useRouter();
 
@@ -32,54 +31,6 @@ export default function SnsFeedScreen() {
     fetchFeedData();
   }, []);
 
-  async function fetchFeedData() {
-    const res = await loadAllFeedContents();
-    apiProcess(res, async (res: ApiSuccess) => {
-      res ? setFeeds(res.response.data || []) : setFeeds([]);
-    });
-  }
-
-  const updateCount = async (postId: string) => {
-    setFeeds((feed) => {
-      const index = feed.findIndex((item) => item.id === postId);
-      if (index === -1) return feed;
-
-      const targetFeed = feed[index];
-      const updatedFeed = {
-        ...targetFeed,
-        isLiked: !targetFeed.isLiked,
-        likeCount: targetFeed.isLiked
-          ? targetFeed.likeCount - 1
-          : targetFeed.likeCount + 1,
-      };
-
-      const newFeeds = [...feed];
-      newFeeds[index] = updatedFeed;
-
-      return newFeeds;
-    });
-  };
-
-  const handleLikeToggle = async (postId: string) => {
-    const res = await addLike({ postId });
-    apiProcess(res, () => updateCount(postId));
-  };
-
-  function handleOpenComment(id: string) {
-    setSelectedPostId(id);
-    fetchComment(id);
-  }
-
-  const fetchComment = async (selectedPostId: string) => {
-    const res = await loadComment(selectedPostId);
-    apiProcess(res, async (res: ApiSuccess) => {
-      setComment({ state: true, list: res.response.data });
-    });
-  };
-
-  function handleCloseComment() {
-    setComment({ state: false, list: [] });
-  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -89,14 +40,7 @@ export default function SnsFeedScreen() {
       >
         <Header />
         {feeds.map((feed) => {
-          return (
-            <Feed
-              key={feed.id}
-              content={feed}
-              likeHandler={() => handleLikeToggle(feed.id)}
-              handleComment={() => handleOpenComment(feed.id)}
-            />
-          );
+          return <Feed key={feed.id} content={feed} />;
         })}
       </ScrollView>
       <View>
@@ -111,14 +55,7 @@ export default function SnsFeedScreen() {
           style={styles.buttonImg}
         />
       </TouchableOpacity>
-      {comment.state && (
-        <Comment
-          comments={comment.list}
-          postId={selectedPostId}
-          closeComment={handleCloseComment}
-          getComment={() => fetchComment(selectedPostId)}
-        />
-      )}
+      {showComments && <Comment />}
     </View>
   );
 }

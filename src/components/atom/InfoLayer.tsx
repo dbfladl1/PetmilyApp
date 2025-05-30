@@ -9,7 +9,7 @@ import {
 import { View, Text } from "react-native";
 import React from "react";
 import RNTouchableOpacity from "./RNTouchableOpacity";
-import { Place } from "@/interface/map";
+import { Place } from "@/src/interface/map";
 
 export default function InfoLayer({ place, closeLayer }: { place: Place, closeLayer: () => void }) {
     const handlePress = (type: "phone" | "link", value: string) => {

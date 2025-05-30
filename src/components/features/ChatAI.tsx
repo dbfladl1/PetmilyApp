@@ -1,14 +1,14 @@
-import CTextInput from "@/components/atom/RNInput";
-import CBtn from "@/components/atom/RNTouchableOpacity";
-import Chat from "@/components/atom/Chat";
+import CTextInput from "@/src/components/atom/RNInput";
+import CBtn from "@/src/components/atom/RNTouchableOpacity";
+import Chat from "@/src/components/atom/Chat";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, ScrollView, Keyboard } from "react-native";
-import OptionButton from "@/components/atom/OptionButton";
-import { petInfo, questionInfo, addedPetInfo } from "@/interface/chat";
+import OptionButton from "@/src/components/atom/OptionButton";
+import { petInfo, questionInfo, addedPetInfo } from "@/src/interface/chat";
 import {
   callGPTGenerateAnswer,
   callGPTGenerateQuestion,
-} from "@/service/api/chatApi";
+} from "@/src/service/api/chatApi";
 import {
   behaviorFlows,
   healthFlows,

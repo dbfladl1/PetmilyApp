@@ -11,13 +11,13 @@ import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
 import { useRouter } from "expo-router";
-import Header from "@/components/ui/Header";
+import Header from "@/src/components/ui/Header";
 import { ScrollView } from "react-native-gesture-handler";
-import { alertDialog } from "@/components/atom/Alert";
+import { alertDialog } from "@/src/components/atom/Alert";
 import * as ImagePicker from "expo-image-picker";
-import CBtn from "@/components/atom/RNTouchableOpacity";
-import { uploadFeed } from "@/service/api/snsApi";
-import { apiProcess } from "@/src/utils/clientResHandler";
+import CBtn from "@/src/components/atom/RNTouchableOpacity";
+import { uploadFeed } from "@/src/service/api/snsApi";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
 
 export default function SnsWriteScreen() {
   const router = useRouter();

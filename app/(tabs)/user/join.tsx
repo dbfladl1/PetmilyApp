@@ -10,23 +10,23 @@ import {
 } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { Picker } from "@react-native-picker/picker";
-import CText from "@/components/atom/RNText";
-import CTextInput from "@/components/atom/RNInput";
-import CBtn, { CLongBtn } from "@/components/atom/RNTouchableOpacity";
-import CPicker from "@/components/atom/RNPicker";
-import SearchAddrView from "@/components/ui/SearchAddr";
+import CText from "@/src/components/atom/RNText";
+import CTextInput from "@/src/components/atom/RNInput";
+import CBtn, { CLongBtn } from "@/src/components/atom/RNTouchableOpacity";
+import CPicker from "@/src/components/atom/RNPicker";
+import SearchAddrView from "@/src/components/ui/SearchAddr";
 import {
   checkIdDupicate,
   joinUser,
   matchAuth,
   sendAuthCodeToEmail,
-} from "@/service/api/userApi";
-import { alertDialog } from "@/components/atom/Alert";
-import { addrType, userForm } from "@/interface/user";
+} from "@/src/service/api/userApi";
+import { alertDialog } from "@/src/components/atom/Alert";
+import { addrType, userForm } from "@/src/interface/user";
 import { useRouter } from "expo-router";
-import { regEngNumChar, regLowerEngNum } from "@/src/utils/Reg";
-import { apiProcess } from "@/src/utils/clientResHandler";
-import { ApiSuccess } from "@/interface/api";
+import { regEngNumChar, regLowerEngNum } from "@/src/utils/reg/Reg";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { ApiSuccess } from "@/src/interface/api";
 
 const vacantUser: userForm = {
   id: "",

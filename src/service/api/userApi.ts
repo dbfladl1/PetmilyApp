@@ -1,4 +1,4 @@
-import { modifyUserInfo } from "@/interface/user";
+import { modifyUserInfo } from "@/src/interface/user";
 import { ApiService } from "./ApiService";
 
 export const checkUserInfo = async () => {

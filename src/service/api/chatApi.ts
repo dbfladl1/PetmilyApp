@@ -1,5 +1,5 @@
 import axios from "axios";
-import { petInfo } from "@/interface/chat";
+import { petInfo } from "@/src/interface/chat";
 import Constants from "expo-constants";
 import { ApiService } from "./ApiService";
 

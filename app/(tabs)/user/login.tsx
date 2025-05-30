@@ -1,17 +1,17 @@
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ActivityIndicator, Image } from "react-native";
-import CText from "@/components/atom/RNText";
-import CTextInput from "@/components/atom/RNInput";
-import { login, submitRefreshToken } from "@/service/api/userApi";
-import { loginInfo } from "@/interface/user";
-import { CLongBtn } from "@/components/atom/RNTouchableOpacity";
+import CText from "@/src/components/atom/RNText";
+import CTextInput from "@/src/components/atom/RNInput";
+import { login, submitRefreshToken } from "@/src/service/api/userApi";
+import { loginInfo } from "@/src/interface/user";
+import { CLongBtn } from "@/src/components/atom/RNTouchableOpacity";
 import { useRouter } from "expo-router";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { alertDialog } from "@/components/atom/Alert";
-import { apiProcess } from "@/src/utils/clientResHandler";
-import { ApiResult, ApiSuccess } from "@/interface/api";
-import { TokenStorage } from "@/src/utils/useAuth";
+import { alertDialog } from "@/src/components/atom/Alert";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { ApiResult, ApiSuccess } from "@/src/interface/api";
+import { TokenStorage } from "@/src/utils/auth/useAuth";
 
 export const LoginScreen = () => {
   const [isLoading, setIsLoading] = useState(true);

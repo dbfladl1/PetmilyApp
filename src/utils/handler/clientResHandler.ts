@@ -1,5 +1,5 @@
-import { alertDialog } from "@/components/atom/Alert";
-import { ApiResult, ApiSuccess } from "@/interface/api";
+import { alertDialog } from "@/src/components/atom/Alert";
+import { ApiResult, ApiSuccess } from "@/src/interface/api";
 
 function returnCommonApiError(status: number, message: string) {
   if (status === -999 || status === -1) {

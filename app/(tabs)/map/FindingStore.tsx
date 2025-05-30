@@ -1,5 +1,5 @@
-import BottomNav from "@/components/ui/BottomNav";
-import Header from "@/components/ui/Header";
+import BottomNav from "@/src/components/ui/BottomNav";
+import Header from "@/src/components/ui/Header";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -17,14 +17,14 @@ import {
   Dimensions,
 } from "react-native";
 import Geolocation from "react-native-geolocation-service";
-import CPicker from "@/components/atom/RNPicker";
+import CPicker from "@/src/components/atom/RNPicker";
 import { Picker } from "@react-native-picker/picker";
-import CategoryList from "@/components/atom/CategoryList";
+import CategoryList from "@/src/components/atom/CategoryList";
 import { useRouter } from "expo-router";
 
-import InfoLayer from "@/components/atom/InfoLayer";
-import { Place } from "@/interface/map";
-import { searchPlaces as searchPetFriendlyPlaces } from "@/service/api/mapApi";
+import InfoLayer from "@/src/components/atom/InfoLayer";
+import { Place } from "@/src/interface/map";
+import { searchPlaces as searchPetFriendlyPlaces } from "@/src/service/api/mapApi";
 import { Animated, Easing } from "react-native";
 
 export default function FindingStoreScreen() {

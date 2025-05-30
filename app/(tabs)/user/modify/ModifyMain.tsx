@@ -1,13 +1,13 @@
-import CText from "@/components/atom/RNText";
-import BottomNav from "@/components/ui/BottomNav";
-import Header from "@/components/ui/Header";
-import { getUserInfo } from "@/service/api/userApi";
+import CText from "@/src/components/atom/RNText";
+import BottomNav from "@/src/components/ui/BottomNav";
+import Header from "@/src/components/ui/Header";
+import { getUserInfo } from "@/src/service/api/userApi";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { TokenStorage } from "@/src/utils/useAuth";
-import { apiProcess } from "@/src/utils/clientResHandler";
-import { ApiResult } from "@/interface/api";
+import { TokenStorage } from "@/src/utils/auth/useAuth";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { ApiResult } from "@/src/interface/api";
 
 export default function ModifyMain() {
   const [user, setUser] = useState<{

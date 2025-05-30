@@ -1,4 +1,4 @@
-import { TokenStorage } from "@/src/utils/useAuth";
+import { TokenStorage } from "@/src/utils/auth/useAuth";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 type ApiSuccess = { success: true; response: AxiosResponse };

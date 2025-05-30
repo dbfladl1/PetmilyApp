@@ -10,25 +10,25 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { alertDialog } from "@/components/atom/Alert";
-import { addrType, userInfo } from "@/interface/user";
+import { alertDialog } from "@/src/components/atom/Alert";
+import { addrType, userInfo } from "@/src/interface/user";
 import {
   getUserInfo,
   matchAuth,
   modifyUser,
   profileImgUpdate,
   sendAuthCodeToEmail,
-} from "@/service/api/userApi";
-import CText from "@/components/atom/RNText";
-import CTextInput from "@/components/atom/RNInput";
-import CBtn, { CLongBtn } from "@/components/atom/RNTouchableOpacity";
-import CPicker from "@/components/atom/RNPicker";
+} from "@/src/service/api/userApi";
+import CText from "@/src/components/atom/RNText";
+import CTextInput from "@/src/components/atom/RNInput";
+import CBtn, { CLongBtn } from "@/src/components/atom/RNTouchableOpacity";
+import CPicker from "@/src/components/atom/RNPicker";
 import { Picker } from "@react-native-picker/picker";
-import Header from "@/components/ui/Header";
-import BottomNav from "@/components/ui/BottomNav";
+import Header from "@/src/components/ui/Header";
+import BottomNav from "@/src/components/ui/BottomNav";
 import * as ImagePicker from "expo-image-picker";
-import { ApiResult } from "@/interface/api";
-import { apiProcess } from "@/src/utils/clientResHandler";
+import { ApiResult } from "@/src/interface/api";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
 
 const vacantUser: userInfo = {
   email: "",

@@ -9,22 +9,31 @@ import {
 } from "react-native";
 import DotButton from "../atom/DotButton";
 import Swiper from "react-native-swiper";
-import { deleteFeed, loadPost } from "@/service/api/snsApi";
+import { addLike, deleteFeed, loadPost } from "@/src/service/api/snsApi";
 import { alertDialog } from "../atom/Alert";
 import { useRouter } from "expo-router";
 import { TapGestureHandler } from "react-native-gesture-handler";
-import { checkUserInfo } from "@/service/api/userApi";
+import { checkUserInfo } from "@/src/service/api/userApi";
 import { Dimensions } from "react-native";
-import { FeedProps } from "@/interface/post";
-import { apiProcess } from "@/src/utils/clientResHandler";
-import { ApiResult } from "@/interface/api";
+import { FeedProps } from "@/src/interface/post";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { ApiResult } from "@/src/interface/api";
+import { snsFeedStore } from "@/src/store/sns/snsFeedStore";
+import { isPostWriter } from "@/src/utils/auth/authUtils";
 
-export default function Feed({
-  content,
-  likeHandler,
-  handleComment,
-}: FeedProps) {
+export default function Feed({ content }: FeedProps) {
   const [innerContents, setInnerContents] = useState(content);
+  const updateCount = snsFeedStore((s) => s.updateCount);
+  const setShowComment = snsFeedStore((s) => s.setShowComment);
+  const selectPost = snsFeedStore((s) => s.selectPost);
+  const fetchSelectedFeedComments = snsFeedStore(
+    (s) => s.fetchSelectedFeedComments
+  );
+
+  const likeHandler = async (postId: string) => {
+    const res = await addLike({ postId });
+    apiProcess(res, () => updateCount(postId));
+  };
 
   const { width: screenWidth } = Dimensions.get("window");
   const aspectRatio = 3 / 3;
@@ -45,15 +54,6 @@ export default function Feed({
       }));
     });
   }
-
-  const isPostWriter = async (writerId: string) => {
-    const res: ApiResult = await checkUserInfo();
-    const isWriter = await apiProcess(
-      res,
-      async (res) => res.response.data.loginId === writerId
-    );
-    return isWriter;
-  };
 
   const handleDelete = async (postId: string, writerId: string) => {
     const isWriter = await isPostWriter(writerId);
@@ -79,10 +79,6 @@ export default function Feed({
     ]);
   };
 
-  function openComment() {
-    handleComment();
-  }
-
   function formatDate(isoString: string): string {
     const date = new Date(isoString);
     const today = new Date();
@@ -101,6 +97,11 @@ export default function Feed({
     } else {
       return date.toISOString().split("T")[0];
     }
+  }
+  function openComments(postId: string) {
+    selectPost(postId);
+    fetchSelectedFeedComments(postId);
+    setShowComment(true);
   }
 
   return (
@@ -127,7 +128,10 @@ export default function Feed({
             callbackFx={() => handleDelete(content.id, content.feedsWriterName)}
           />
         </View>
-        <TapGestureHandler numberOfTaps={2} onActivated={() => likeHandler()}>
+        <TapGestureHandler
+          numberOfTaps={2}
+          onActivated={() => likeHandler(content.id)}
+        >
           <View>
             <Swiper
               showsPagination={true}
@@ -158,7 +162,7 @@ export default function Feed({
         <View style={styles.txtCon}>
           <View style={{ flexDirection: "row", gap: 5, marginBottom: 5 }}>
             <TouchableOpacity
-              onPress={likeHandler}
+              onPress={() => likeHandler(content.id)}
               activeOpacity={1}
               style={{ flexDirection: "row", alignItems: "center" }}
             >
@@ -175,7 +179,7 @@ export default function Feed({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={openComment}
+              onPress={() => openComments(content.id)}
               activeOpacity={1}
               style={{ flexDirection: "row" }}
             >

@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
 import React, { useState } from "react";
-import CPicker from "@/components/atom/RNPicker";
+import CPicker from "@/src/components/atom/RNPicker";
 import { Picker } from "@react-native-picker/picker";
-import CText from "@/components/atom/RNText";
-import CTextInput from "@/components/atom/RNInput";
-import { addrType } from "@/interface/user";
-import CBtn from "@/components/atom/RNTouchableOpacity";
-import SearchAddrView from "@/components/ui/SearchAddr";
-import BottomNav from "@/components/ui/BottomNav";
-import Header from "@/components/ui/Header";
+import CText from "@/src/components/atom/RNText";
+import CTextInput from "@/src/components/atom/RNInput";
+import { addrType } from "@/src/interface/user";
+import CBtn from "@/src/components/atom/RNTouchableOpacity";
+import SearchAddrView from "@/src/components/ui/SearchAddr";
+import BottomNav from "@/src/components/ui/BottomNav";
+import Header from "@/src/components/ui/Header";
 import axios from "axios";
 
 export default function FindingPetRegister() {

@@ -1,9 +1,11 @@
 import { View, Text, Pressable, Alert, Image, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import { deleteComment } from "@/service/api/snsApi";
+import { deleteComment } from "@/src/service/api/snsApi";
 import { alertDialog } from "./Alert";
-import { CommentItemType } from "@/interface/post";
-import { apiProcess } from "@/src/utils/clientResHandler";
+import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { snsFeedStore } from "@/src/store/sns/snsFeedStore";
+import { CommentType } from "@/src/interface/post";
+import { isPostWriter } from "@/src/utils/auth/authUtils";
 
 export default function CommentItem({
   postId,
@@ -11,12 +13,17 @@ export default function CommentItem({
   refresh,
 }: {
   postId: string;
-  comment: CommentItemType;
+  comment: CommentType;
   refresh: () => void;
 }) {
   const [pressed, setPressed] = useState(false);
 
-  const handleLongPress = (postId: string, commentId: string) => {
+  const handleLongPress = async (postId: string, commentId: string) => {
+    const isWriter = await isPostWriter(comment.loginId);
+
+    if (isWriter !== true) {
+      return;
+    }
     Alert.alert("삭제하시겠습니까?", "댓글을 삭제하시겠어요?", [
       { text: "취소", style: "cancel" },
       {
