@@ -16,7 +16,7 @@ export const snsFeedStore = create(
       showComments: false,
       selectedPostId: "",
     },
-    (set, get) => {
+    (set) => {
       return {
         fetchFeedData: async () => {
           const res = await loadAllFeedContents();

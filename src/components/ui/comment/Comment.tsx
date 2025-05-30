@@ -143,27 +143,5 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 20,
-  },
-  typeArea: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 10,
-    padding: 10,
-  },
-  inputBox: {
-    borderBottomColor: "#555",
-    borderBottomWidth: 0.5,
-    width: "80%",
-  },
-  basicImage: {
-    height: 29,
-    width: 29,
-    margin: 7,
-  },
-  profileImage: {
-    height: 35,
-    width: 35,
-    borderRadius: 25,
-  },
+  }
 });
