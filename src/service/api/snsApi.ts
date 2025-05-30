@@ -14,8 +14,6 @@ export const loadPost = async (id: string) => {
 
 export const loadComment = async (feedId: string) => {
   const response = await ApiService.get(`/api/v1/feed/${feedId}/comments`);
-  console.log("ddd",feedId)
-  console.log(response)
 
   return response;
 };

@@ -9,20 +9,13 @@ import {
   TouchableOpacity,
 } from "react-native";
 import BottomNav from "@/src/components/ui/BottomNav";
-import Comment from "@/src/components/ui/Comment";
+import Comment from "@/src/components/ui/comment/Comment";
 import { useRouter } from "expo-router";
-import { addLike, loadComment } from "@/src/service/api/snsApi";
-import { apiProcess } from "@/src/utils/handler/clientResHandler";
-import { ApiSuccess } from "@/src/interface/api";
 import { snsFeedStore } from "@/src/store/sns/snsFeedStore";
 
 export default function SnsFeedScreen() {
   const feeds = snsFeedStore((s) => s.feeds);
   const fetchFeedData = snsFeedStore((s) => s.fetchFeedData);
-  const updateCount = snsFeedStore((s) => s.updateCount);
-  const fetchSelectedFeedComments = snsFeedStore(
-    (s) => s.fetchSelectedFeedComments
-  );
   const showComments = snsFeedStore((s) => s.showComments);
 
   const router = useRouter();
@@ -43,6 +36,7 @@ export default function SnsFeedScreen() {
           return <Feed key={feed.id} content={feed} />;
         })}
       </ScrollView>
+      <View style={{height:30}}></View>
       <View>
         <BottomNav />
       </View>

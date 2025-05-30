@@ -2,41 +2,30 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
-  Text,
   ScrollView,
-  TextInput,
   Animated,
   PanResponder,
 } from "react-native";
-import CBtn from "../atom/RNTouchableOpacity";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import CommentItem from "../atom/CommentItem";
-import { apiProcess } from "@/src/utils/handler/clientResHandler";
-import { createComment } from "@/src/service/api/snsApi";
 import { snsFeedStore } from "@/src/store/sns/snsFeedStore";
+import CommentList from "./CommentList";
+import CommentInput from "./CommentInput";
 
 export default function Comment() {
   const scrollRef = useRef<ScrollView>(null);
   const comments = snsFeedStore((s) => s.comments);
-  const fetchSelectedFeedComments = snsFeedStore(
-    (s) => s.fetchSelectedFeedComments
-  );
-  const selectedPostId = snsFeedStore((s) => s.selectedPostId);
   const closeComment = snsFeedStore((s) => s.closeComment);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       scrollRef.current?.scrollToEnd({ animated: true });
     }, 10);
-    console.log("@@", comments)
 
     return () => clearTimeout(timer);
   }, [comments]);
 
   const [isVisible, setIsVisible] = useState(true);
   const barRef = useRef<View>(null); // null로 초기화
-
-  const [content, setContent] = useState("");
 
   const pan = useRef(new Animated.Value(0)).current;
 
@@ -93,17 +82,6 @@ export default function Comment() {
     return null;
   } // 패널 숨김 처리
 
-  const submitComment = async () => {
-    const res = await createComment(selectedPostId, {
-      content,
-      parentComentId: "0",
-    });
-    await apiProcess(res, async () => {
-      fetchSelectedFeedComments(selectedPostId);
-      setContent("");
-    });
-  };
-
   return (
     <SafeAreaProvider style={styles.overlay}>
       <Animated.View
@@ -117,26 +95,9 @@ export default function Comment() {
           <View style={styles.bar}></View>
         </View>
         <ScrollView style={styles.commentBox} ref={scrollRef}>
-          {comments.map((comment) => (
-            <CommentItem
-              key={comment.commentId}
-              comment={comment}
-              postId={selectedPostId}
-              refresh={() => fetchSelectedFeedComments(selectedPostId)}
-            />
-          ))}
+          <CommentList />
         </ScrollView>
-        <View style={styles.typeArea}>
-          <TextInput
-            value={content}
-            style={styles.inputBox}
-            multiline={true}
-            onChangeText={(content) => setContent(content)}
-          />
-          <CBtn style={{ width: "17%" }} onPress={submitComment}>
-            <Text style={{ color: "#fff" }}>등록</Text>
-          </CBtn>
-        </View>
+        <CommentInput />
       </Animated.View>
     </SafeAreaProvider>
   );

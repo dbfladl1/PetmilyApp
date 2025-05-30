@@ -59,7 +59,6 @@ export class ApiService {
     config?: AxiosRequestConfig
   ): Promise<ApiResult> {
     try {
-      console.log("data@@",data)
       const response = await apiClient.put<T>(url, data, config);
       return { success: true, response: response };
     } catch (error) {

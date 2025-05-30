@@ -8,7 +8,5 @@ export const isPostWriter = async (writerId: string) => {
       res,
       async (res) => res.response.data.loginId === writerId
     );
-    console.log(isWriter)
-    console.log(writerId)
     return isWriter;
   };

@@ -31,7 +31,7 @@ export const callGPTGenerateQuestion = async (
       {
         model: "gpt-4",
         messages: [
-          {
+        {
             role: "system",
             content: `${setChatHistory}와 ${petInfo}를 참고하고, 사용자의 질문을 확인해서 답변을 해줘, 추가 정보가 필요하다면 사용자에게 요청하도록 해.  ${setChatHistory}를 참고해서 형식에 맞게 반환해주면 돼. 넌 전문가니까 사용자에게 직접 말하듯, 상담하듯 말해. 하지만 정말말 어렵거나 답을 알 수 없는 질문은 전문가를 실제로 만나서서 상담을 권장하도록 해. 
               주의:
