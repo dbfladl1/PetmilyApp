@@ -16,7 +16,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { alertDialog } from "@/src/components/atom/Alert";
 import * as ImagePicker from "expo-image-picker";
 import CBtn from "@/src/components/atom/RNTouchableOpacity";
-import { uploadFeed } from "@/src/service/api/snsApi";
+import { uploadFeed } from "@/src/service/snsApi";
 import { apiProcess } from "@/src/utils/handler/clientResHandler";
 
 export default function SnsWriteScreen() {

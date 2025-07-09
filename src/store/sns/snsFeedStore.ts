@@ -3,7 +3,7 @@ import { CommentType, feedType } from "@/src/interface/post";
 import {
   loadAllFeedContents,
   loadComment,
-} from "@/src/service/api/snsApi";
+} from "@/src/service/snsApi";
 import { apiProcess } from "@/src/utils/handler/clientResHandler";
 import { create } from "zustand";
 import { combine } from "zustand/middleware";

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ActivityIndicator, Image } from "react-native";
 import CText from "@/src/components/atom/RNText";
 import CTextInput from "@/src/components/atom/RNInput";
-import { login, submitRefreshToken } from "@/src/service/api/userApi";
+import { login, submitRefreshToken } from "@/src/service/userApi";
 import { loginInfo } from "@/src/interface/user";
 import { CLongBtn } from "@/src/components/atom/RNTouchableOpacity";
 import { useRouter } from "expo-router";

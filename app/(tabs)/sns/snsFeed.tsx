@@ -1,6 +1,6 @@
 import Header from "@/src/components/ui/Header";
 import Feed from "@/src/components/ui/Feed";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   ScrollView,
@@ -10,20 +10,25 @@ import {
 } from "react-native";
 import BottomNav from "@/src/components/ui/BottomNav";
 import Comment from "@/src/components/ui/comment/Comment";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { snsFeedStore } from "@/src/store/sns/snsFeedStore";
 
 export default function SnsFeedScreen() {
   const feeds = snsFeedStore((s) => s.feeds);
   const fetchFeedData = snsFeedStore((s) => s.fetchFeedData);
   const showComments = snsFeedStore((s) => s.showComments);
+  const closeComment = snsFeedStore((s) => s.closeComment);
 
   const router = useRouter();
 
-  useEffect(() => {
-    fetchFeedData();
-  }, []);
-
+  useFocusEffect(
+    useCallback(() => {
+      fetchFeedData();
+      return () => {
+        closeComment(); 
+      };
+    }, [])
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -36,7 +41,7 @@ export default function SnsFeedScreen() {
           return <Feed key={feed.id} content={feed} />;
         })}
       </ScrollView>
-      <View style={{height:30}}></View>
+      <View style={{ height: 30 }}></View>
       <View>
         <BottomNav />
       </View>

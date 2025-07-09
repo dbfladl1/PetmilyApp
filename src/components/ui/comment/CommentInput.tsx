@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextInput, View, Text, StyleSheet } from "react-native";
 import CBtn from "../../atom/RNTouchableOpacity";
-import { createComment } from "@/src/service/api/snsApi";
+import { createComment } from "@/src/service/snsApi";
 import { apiProcess } from "@/src/utils/handler/clientResHandler";
 import { snsFeedStore } from "@/src/store/sns/snsFeedStore";
 

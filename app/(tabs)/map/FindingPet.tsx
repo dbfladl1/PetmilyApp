@@ -23,7 +23,7 @@ import { useRouter } from "expo-router";
 import {
   getCurrentLocation,
   requestLocationPermission,
-} from "@/src/service/api/locationService";
+} from "@/src/service/locationService";
 
 export default function FindingPetScreen() {
   const router = useRouter();

@@ -17,13 +17,13 @@ export interface addedPetInfo {
   weight: string;
 }
 
-
-export interface questionInfo {
+export interface chatContentInfo {
   step: number;
   message: string;
+  sender: string;
   type: string;
   examples?: string[];
   branchMap?: { [key: string]: string };
   guide?: string;
-}
-[];
+};
+

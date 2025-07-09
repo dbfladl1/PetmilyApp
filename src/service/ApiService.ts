@@ -34,7 +34,7 @@ export class ApiService {
 
       return { success: true, response: response };
     } catch (error) {
-      const response = handleAxiosError(error);
+      const response = handleAxiosError(error, url);
       return response;
     }
   }
@@ -48,7 +48,7 @@ export class ApiService {
       const response = await apiClient.post<T>(url, data, config);
       return { success: true, response: response };
     } catch (error) {
-      const response = handleAxiosError(error);
+      const response = handleAxiosError(error, url);
       return response;
     }
   }
@@ -62,7 +62,7 @@ export class ApiService {
       const response = await apiClient.put<T>(url, data, config);
       return { success: true, response: response };
     } catch (error) {
-      const response = handleAxiosError(error);
+      const response = handleAxiosError(error, url);
       return response;
     }
   }
@@ -75,17 +75,18 @@ export class ApiService {
       const response = await apiClient.delete<T>(url, config);
       return { success: true, response: response };
     } catch (error) {
-      const response = handleAxiosError(error);
+      const response = handleAxiosError(error, url);
       return response;
     }
   }
 }
 
-function handleAxiosError(error: unknown): ApiResult {
+function handleAxiosError(error: unknown, url:string): ApiResult {
   console.log(error);
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? -1;
     console.log("🔴 fialed api request");
+    console.log("🔴 fialed from : ", url);
     console.log("🔸 status:", status);
     console.log("🔸 data:", error.response?.data.message);
     return {

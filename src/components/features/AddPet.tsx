@@ -4,7 +4,7 @@ import Chat from "@/src/components/atom/Chat";
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, ScrollView, Keyboard } from "react-native";
 import OptionButton from "@/src/components/atom/OptionButton";
-import { enrolledMypet, getMyPet } from "@/src/service/api/chatApi";
+import { enrolledMypet, getMyPet } from "@/src/service/chatApi";
 import { questions } from "@/data/enrolledStep";
 import { addedPetInfo, petInfo } from "@/src/interface/chat";
 

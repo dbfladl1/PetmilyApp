@@ -1,6 +1,6 @@
 import { View, Text, Pressable, Alert, Image, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import { deleteComment } from "@/src/service/api/snsApi";
+import { deleteComment } from "@/src/service/snsApi";
 import { alertDialog } from "../../atom/Alert";
 import { apiProcess } from "@/src/utils/handler/clientResHandler";
 import { snsFeedStore } from "@/src/store/sns/snsFeedStore";

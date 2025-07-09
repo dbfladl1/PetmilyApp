@@ -24,7 +24,7 @@ import { useRouter } from "expo-router";
 
 import InfoLayer from "@/src/components/atom/InfoLayer";
 import { Place } from "@/src/interface/map";
-import { searchPlaces as searchPetFriendlyPlaces } from "@/src/service/api/mapApi";
+import { searchPlaces as searchPetFriendlyPlaces } from "@/src/service/mapApi";
 import { Animated, Easing } from "react-native";
 
 export default function FindingStoreScreen() {

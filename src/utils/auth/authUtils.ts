@@ -1,5 +1,5 @@
 import { ApiResult } from "@/src/interface/api";
-import { checkUserInfo } from "@/src/service/api/userApi";
+import { checkUserInfo } from "@/src/service/userApi";
 import { apiProcess } from "../handler/clientResHandler";
 
 export const isPostWriter = async (writerId: string) => {

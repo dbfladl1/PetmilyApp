@@ -1,7 +1,7 @@
 import CText from "@/src/components/atom/RNText";
 import BottomNav from "@/src/components/ui/BottomNav";
 import Header from "@/src/components/ui/Header";
-import { getUserInfo } from "@/src/service/api/userApi";
+import { getUserInfo } from "@/src/service/userApi";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";

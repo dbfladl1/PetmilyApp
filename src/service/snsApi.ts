@@ -8,7 +8,7 @@ export const loadAllFeedContents = async () => {
 
 export const loadPost = async (id: string) => {
   const response = await ApiService.get(`/api/v1/feed/${id}`);
-
+  
   return response;
 };
 
@@ -47,6 +47,8 @@ export const addLike = async (data: { postId: string }) => {
 export const deleteFeed = async (id: string) => {
   const response = await ApiService.delete(`/api/v1/feed/${id}`);
 
+
+  console.log("del", response)
   return response;
 };
 

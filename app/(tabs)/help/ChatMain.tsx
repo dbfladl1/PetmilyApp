@@ -6,7 +6,6 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { getMyPet } from "@/src/service/api/chatApi";
 import { addedPetInfo } from "@/src/interface/chat";
 import { StyleSheet } from "react-native";
 import AddPet from "../../../src/components/features/AddPet";
@@ -14,41 +13,22 @@ import ChatAi from "../../../src/components/features/ChatAI";
 import BottomNav from "@/src/components/ui/BottomNav";
 import Header from "@/src/components/ui/Header";
 import Pannel from "@/src/components/atom/Pannel";
-import { apiProcess } from "@/src/utils/handler/clientResHandler";
-import { ApiSuccess } from "@/src/interface/api";
+import { helpWithAiStore } from "@/src/store/help/helpWithAiStore";
 
 export default function ChatMain() {
-  const [petInfo, setPetInfo] = useState<addedPetInfo[]>([]);
-  const [selectedPet, setSelectedPet] = useState<addedPetInfo>(petInfo[0]);
-  const [chatType, setChatType] = useState<"loading" | "chat" | "add">(
-    "loading"
-  );
+  const fetchPetList = helpWithAiStore((s) => s.fetchPetList);
+  const petList = helpWithAiStore((s) => s.petList);
+  const handleSelectPet = helpWithAiStore((s) => s.handleSelectPet);
+  const chatType = helpWithAiStore((s) => s.chatType);
+  const setChatType = helpWithAiStore((s) => s.setChatType);
 
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   useEffect(() => {
-    fetchPetInfo();
+    fetchPetList();
   }, []);
 
-  const fetchPetList = async (res: ApiSuccess) => {
-    const petList = res.response.data.animalInfos;
-    if (petList.length === 0) {
-      setChatType("add");
-    } else {
-      setPetInfo(petList);
-      setSelectedPet(petList[0]);
-      setChatType("chat");
-    }
-  };
 
-  async function fetchPetInfo() {
-    const res = await getMyPet();
-    apiProcess(res, fetchPetList);
-  }
-
-  const settingPetInfo = (pet: addedPetInfo) => {
-    setSelectedPet(pet);
-  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -58,8 +38,8 @@ export default function ChatMain() {
       {chatType === "chat" && (
         <Pannel
           title={"상담 내역"}
-          list={petInfo}
-          selectHandle={(pet) => settingPetInfo(pet as addedPetInfo)}
+          list={petList}
+          selectHandle={(pet) => handleSelectPet(pet as addedPetInfo)}
           onOpen={() => setIsPanelOpen(true)}
           onClose={() => setIsPanelOpen(false)}
           isOpen={isPanelOpen}
@@ -107,7 +87,7 @@ export default function ChatMain() {
         {chatType === "add" ? (
           <AddPet />
         ) : chatType === "chat" ? (
-          <ChatAi pet={selectedPet} petInfoChanged={fetchPetInfo} />
+          <ChatAi />
         ) : (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#0000ff" />

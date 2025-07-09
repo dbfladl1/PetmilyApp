@@ -18,7 +18,7 @@ import {
   modifyUser,
   profileImgUpdate,
   sendAuthCodeToEmail,
-} from "@/src/service/api/userApi";
+} from "@/src/service/userApi";
 import CText from "@/src/components/atom/RNText";
 import CTextInput from "@/src/components/atom/RNInput";
 import CBtn, { CLongBtn } from "@/src/components/atom/RNTouchableOpacity";
@@ -340,7 +340,7 @@ export default function ModifyInfo() {
 
           <View style={styles.btnContainer}>
             <CLongBtn style={styles.button} onPress={modify}>
-              <CText style={styles.smallButtonText}>회원정보 수정</CText>
+              <CText style={styles.smallButtonText}>회원정보 수ㄴㄴ정</CText>
             </CLongBtn>
           </View>
         </ScrollView>

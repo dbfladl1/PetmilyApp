@@ -20,7 +20,7 @@ import {
   joinUser,
   matchAuth,
   sendAuthCodeToEmail,
-} from "@/src/service/api/userApi";
+} from "@/src/service/userApi";
 import { alertDialog } from "@/src/components/atom/Alert";
 import { addrType, userForm } from "@/src/interface/user";
 import { useRouter } from "expo-router";

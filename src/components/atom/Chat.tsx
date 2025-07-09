@@ -9,7 +9,7 @@ interface ChatProps{
 export default function Chat({type, text}:ChatProps) {
   return (
     <View>
-      <Text style={type === "answer" ? styles.clientChat : styles.aiChat}>
+      <Text style={type === "user" ? styles.clientChat : styles.aiChat}>
         {text}
       </Text>
     </View>

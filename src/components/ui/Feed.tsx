@@ -9,11 +9,10 @@ import {
 } from "react-native";
 import DotButton from "../atom/DotButton";
 import Swiper from "react-native-swiper";
-import { addLike, deleteFeed, loadPost } from "@/src/service/api/snsApi";
+import { addLike, deleteFeed, loadPost } from "@/src/service/snsApi";
 import { alertDialog } from "../atom/Alert";
 import { useRouter } from "expo-router";
 import { TapGestureHandler } from "react-native-gesture-handler";
-import { checkUserInfo } from "@/src/service/api/userApi";
 import { Dimensions } from "react-native";
 import { FeedProps } from "@/src/interface/post";
 import { apiProcess } from "@/src/utils/handler/clientResHandler";
@@ -41,20 +40,6 @@ export default function Feed({ content }: FeedProps) {
 
   const router = useRouter();
 
-  useEffect(() => {
-    loadInnerContents();
-  }, []);
-
-  async function loadInnerContents() {
-    const res: ApiResult = await loadPost(content.id);
-    apiProcess(res, async (res) => {
-      setInnerContents((prev) => ({
-        ...prev,
-        ...res.response.data,
-      }));
-    });
-  }
-
   const handleDelete = async (postId: string, writerId: string) => {
     const isWriter = await isPostWriter(writerId);
 
@@ -71,9 +56,10 @@ export default function Feed({ content }: FeedProps) {
         text: "삭제",
         onPress: async () => {
           const res: ApiResult = await deleteFeed(postId);
-          apiProcess(res, async () => alertDialog("삭제되었습니다."));
-
-          router.replace("/sns/snsFeed");
+          apiProcess(res, async () => {
+            alertDialog("삭제되었습니다.");
+            router.replace("/sns/snsFeed");
+          });
         },
       },
     ]);
