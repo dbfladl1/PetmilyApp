@@ -29,6 +29,7 @@ import BottomNav from "@/src/components/ui/BottomNav";
 import * as ImagePicker from "expo-image-picker";
 import { ApiResult } from "@/src/interface/api";
 import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const vacantUser: userInfo = {
   email: "",
@@ -202,108 +203,109 @@ export default function ModifyInfo() {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={{ flex: 1, backgroundColor: "#fff" }}>
-        <View>
-          <Header />
-        </View>
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.profilePicture}>
-            <CText style={styles.title}>프로필 이미지 변경</CText>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={selectProfile}
-              style={styles.profileImageView}
-            >
-              <View style={styles.imgContainer}>
-                <Image
-                  source={
-                    user.profilePicturePath === ""
-                      ? require("@/assets/images/icon/photo.png")
-                      : { uri: user.profilePicturePath }
-                  }
-                  style={
-                    user.profilePicturePath === ""
-                      ? styles.photoImg
-                      : styles.profileImageView
-                  }
-                />
-              </View>
-            </TouchableOpacity>
-          </View>
-          <CText style={styles.title}>회원정보 수정</CText>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={{ flex: 1, backgroundColor: "#fff" }}>
           <View>
-            <CText style={styles.label}>전화번호</CText>
-            <CTextInput
-              style={styles.input}
-              placeholder="01012341234"
-              value={user.phone}
-              placeholderTextColor="#A0A0A0"
-              keyboardType="number-pad"
-              onChangeText={(phone) => {
-                updateUserField("phone", phone);
-              }}
-            />
+            <Header />
           </View>
-
-          <View>
-            <CText style={styles.label}>* 이메일</CText>
-            <View style={styles.inputRow}>
+          <ScrollView
+            contentContainerStyle={styles.container}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.profilePicture}>
+              <CText style={styles.title}>프로필 이미지 변경</CText>
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={selectProfile}
+                style={styles.profileImageView}
+              >
+                <View style={styles.imgContainer}>
+                  <Image
+                    source={
+                      user.profilePicturePath === ""
+                        ? require("@/assets/images/icon/photo.png")
+                        : { uri: user.profilePicturePath }
+                    }
+                    style={
+                      user.profilePicturePath === ""
+                        ? styles.photoImg
+                        : styles.profileImageView
+                    }
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
+            <CText style={styles.title}>회원정보 수정</CText>
+            <View>
+              <CText style={styles.label}>전화번호</CText>
               <CTextInput
-                style={[styles.input, styles.flex]}
-                placeholder="아이디"
-                value={emailLocal}
+                style={styles.input}
+                placeholder="01012341234"
+                value={user.phone}
                 placeholderTextColor="#A0A0A0"
-                onChangeText={(email) => {
-                  setEmailLocal(email);
-                  setSendAuth(false);
-                }}
-              />
-              <CTextInput
-                placeholder="직접 입력 또는 선택"
-                placeholderTextColor="#A0A0A0"
-                style={{ minWidth: 145 }}
-                editable={emailDomain === "custom"}
-                value={emailDomain !== "custom" ? emailDomain : undefined}
-                onChangeText={(domain) => {
-                  setCustomDomain(domain);
-                  setSendAuth(false);
+                keyboardType="number-pad"
+                onChangeText={(phone) => {
+                  updateUserField("phone", phone);
                 }}
               />
             </View>
-          </View>
-          <View style={styles.input}>
-            <CPicker
-              selectedValue={emailDomain}
-              onValueChange={(domain) => {
-                setEmailDomain(
-                  domain === "custom" ? "custom" : (domain as string)
-                );
-                setSendAuth(false);
-              }}
-            >
-              <Picker.Item label="gmail.com" value="gmail.com" />
-              <Picker.Item label="naver.com" value="naver.com" />
-              <Picker.Item label="daum.net" value="daum.net" />
-              <Picker.Item label="직접 입력" value="custom" />
-            </CPicker>
-          </View>
-          <CLongBtn onPress={emailAuthHandler}>
-            <Text style={styles.smallButtonText}>인증코드 발송</Text>
-          </CLongBtn>
-          <View style={styles.inputRow}>
-            <CTextInput
-              style={[styles.input, styles.flex]}
-              onChangeText={(number) => setAuthCode(number)}
-            />
-            <CBtn style={styles.smallButton} onPress={matchAuthWithUser}>
-              <CText style={styles.smallButtonText}>코드 확인</CText>
-            </CBtn>
-          </View>
-          {/* <View>
+
+            <View>
+              <CText style={styles.label}>* 이메일</CText>
+              <View style={styles.inputRow}>
+                <CTextInput
+                  style={[styles.input, styles.flex]}
+                  placeholder="아이디"
+                  value={emailLocal}
+                  placeholderTextColor="#A0A0A0"
+                  onChangeText={(email) => {
+                    setEmailLocal(email);
+                    setSendAuth(false);
+                  }}
+                />
+                <CTextInput
+                  placeholder="직접 입력 또는 선택"
+                  placeholderTextColor="#A0A0A0"
+                  style={{ minWidth: 145 }}
+                  editable={emailDomain === "custom"}
+                  value={emailDomain !== "custom" ? emailDomain : undefined}
+                  onChangeText={(domain) => {
+                    setCustomDomain(domain);
+                    setSendAuth(false);
+                  }}
+                />
+              </View>
+            </View>
+            <View style={styles.input}>
+              <CPicker
+                selectedValue={emailDomain}
+                onValueChange={(domain) => {
+                  setEmailDomain(
+                    domain === "custom" ? "custom" : (domain as string)
+                  );
+                  setSendAuth(false);
+                }}
+              >
+                <Picker.Item label="gmail.com" value="gmail.com" />
+                <Picker.Item label="naver.com" value="naver.com" />
+                <Picker.Item label="daum.net" value="daum.net" />
+                <Picker.Item label="직접 입력" value="custom" />
+              </CPicker>
+            </View>
+            <CLongBtn onPress={emailAuthHandler}>
+              <Text style={styles.smallButtonText}>인증코드 발송</Text>
+            </CLongBtn>
+            <View style={styles.inputRow}>
+              <CTextInput
+                style={[styles.input, styles.flex]}
+                onChangeText={(number) => setAuthCode(number)}
+              />
+              <CBtn style={styles.smallButton} onPress={matchAuthWithUser}>
+                <CText style={styles.smallButtonText}>코드 확인</CText>
+              </CBtn>
+            </View>
+            {/* <View>
             <CText style={styles.label}>주소 찾기</CText>
             <View style={styles.inputRow}>
               <CTextInput
@@ -338,17 +340,18 @@ export default function ModifyInfo() {
             />
           </View> */}
 
-          <View style={styles.btnContainer}>
-            <CLongBtn style={styles.button} onPress={modify}>
-              <CText style={styles.smallButtonText}>회원정보 수ㄴㄴ정</CText>
-            </CLongBtn>
+            <View style={styles.btnContainer}>
+              <CLongBtn style={styles.button} onPress={modify}>
+                <CText style={styles.smallButtonText}>회원정보 수ㄴㄴ정</CText>
+              </CLongBtn>
+            </View>
+          </ScrollView>
+          <View>
+            <BottomNav />
           </View>
-        </ScrollView>
-        <View>
-          <BottomNav />
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 

@@ -8,6 +8,7 @@ import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { TokenStorage } from "@/src/utils/auth/useAuth";
 import { apiProcess } from "@/src/utils/handler/clientResHandler";
 import { ApiResult } from "@/src/interface/api";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ModifyMain() {
   const [user, setUser] = useState<{
@@ -33,7 +34,7 @@ export default function ModifyMain() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <Header />
       <View style={styles.container}>
         <Text style={styles.title}>계정 관리</Text>
@@ -86,8 +87,10 @@ export default function ModifyMain() {
           </TouchableOpacity>
         </View>
       </View>
-      <BottomNav />
-    </View>
+      <View>
+        <BottomNav />
+      </View>
+    </SafeAreaView>
   );
 }
 

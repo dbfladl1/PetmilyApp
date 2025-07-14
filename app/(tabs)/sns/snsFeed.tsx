@@ -1,6 +1,7 @@
 import Header from "@/src/components/ui/Header";
 import Feed from "@/src/components/ui/Feed";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   ScrollView,
@@ -31,7 +32,7 @@ export default function SnsFeedScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView
         style={{ flex: 1, flexDirection: "column" }}
         contentContainerStyle={{ flexGrow: 1 }}
@@ -55,7 +56,7 @@ export default function SnsFeedScreen() {
         />
       </TouchableOpacity>
       {showComments && <Comment />}
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

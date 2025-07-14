@@ -14,6 +14,7 @@ import BottomNav from "@/src/components/ui/BottomNav";
 import Header from "@/src/components/ui/Header";
 import Pannel from "@/src/components/atom/Pannel";
 import { helpWithAiStore } from "@/src/store/help/helpWithAiStore";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChatMain() {
   const fetchPetList = helpWithAiStore((s) => s.fetchPetList);
@@ -31,7 +32,7 @@ export default function ChatMain() {
 
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <View>
         <Header />
       </View>
@@ -112,7 +113,7 @@ export default function ChatMain() {
       <View>
         <BottomNav />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

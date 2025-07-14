@@ -18,6 +18,7 @@ import * as ImagePicker from "expo-image-picker";
 import CBtn from "@/src/components/atom/RNTouchableOpacity";
 import { uploadFeed } from "@/src/service/snsApi";
 import { apiProcess } from "@/src/utils/handler/clientResHandler";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SnsWriteScreen() {
   const router = useRouter();
@@ -82,59 +83,61 @@ export default function SnsWriteScreen() {
     );
   };
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Header />
-        <View style={styles.screenHeader}>
-          <TouchableOpacity
-            style={styles.backButton}
-            activeOpacity={1}
-            onPress={() => router.push("/sns/snsFeed")}
-          >
-            <Image
-              source={require("@/assets/images/icon/back.png")}
-              style={{ width: "100%", height: "100%", position: "absolute" }}
-            />
-          </TouchableOpacity>
-          <Text style={styles.screenHeaderText}>사진 올리기</Text>
-        </View>
-        <View style={{ height: 50 }} />
-        <Image
-          source={{ uri: selectedImages[selectedImageIndex] }}
-          style={styles.bigImage}
-          resizeMode="cover"
-        />
-        <DraggableFlatList
-          data={selectedImages}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => `image-${index}`}
-          horizontal
-          onDragEnd={({ data }) => setSelectedImages(data)}
-          style={styles.imageContainer}
-        />
-        <View style={styles.textContainer}>
-          <TextInput
-            style={styles.inputBox}
-            multiline={true}
-            placeholder="내용을 입력해주세요"
-            onChangeText={(text) => {
-              setContents(text);
-            }}
+    <SafeAreaView>
+      <ScrollView>
+        <View style={styles.container}>
+          <Header />
+          <View style={styles.screenHeader}>
+            <TouchableOpacity
+              style={styles.backButton}
+              activeOpacity={1}
+              onPress={() => router.push("/sns/snsFeed")}
+            >
+              <Image
+                source={require("@/assets/images/icon/back.png")}
+                style={{ width: "100%", height: "100%", position: "absolute" }}
+              />
+            </TouchableOpacity>
+            <Text style={styles.screenHeaderText}>사진 올리기</Text>
+          </View>
+          <View style={{ height: 50 }} />
+          <Image
+            source={{ uri: selectedImages[selectedImageIndex] }}
+            style={styles.bigImage}
+            resizeMode="cover"
           />
+          <DraggableFlatList
+            data={selectedImages}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => `image-${index}`}
+            horizontal
+            onDragEnd={({ data }) => setSelectedImages(data)}
+            style={styles.imageContainer}
+          />
+          <View style={styles.textContainer}>
+            <TextInput
+              style={styles.inputBox}
+              multiline={true}
+              placeholder="내용을 입력해주세요"
+              onChangeText={(text) => {
+                setContents(text);
+              }}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <CBtn style={styles.smallButton} onPress={uploadFeedHandler}>
+              등록
+            </CBtn>
+          </View>
         </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <CBtn style={styles.smallButton} onPress={uploadFeedHandler}>
-            등록
-          </CBtn>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

@@ -26,6 +26,7 @@ import InfoLayer from "@/src/components/atom/InfoLayer";
 import { Place } from "@/src/interface/map";
 import { searchPlaces as searchPetFriendlyPlaces } from "@/src/service/mapApi";
 import { Animated, Easing } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FindingStoreScreen() {
   const router = useRouter();
@@ -153,8 +154,7 @@ export default function FindingStoreScreen() {
   });
 
   return (
-    <View style={{ flex: 1 }}>
-      <Header />
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.filterContainer}>
         <View
           style={{
@@ -260,8 +260,10 @@ export default function FindingStoreScreen() {
           { category: "공원", color: "#F69F20" },
         ]}
       />
-      <BottomNav />
-    </View>
+      <View>
+        <BottomNav />
+      </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
