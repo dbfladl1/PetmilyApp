@@ -62,7 +62,7 @@ export default function SnsFeedScreen() {
 const styles = StyleSheet.create({
   addButton: {
     position: "absolute",
-    bottom: 70,
+    bottom: 130,
     right: 10,
     width: 35,
     height: 35,

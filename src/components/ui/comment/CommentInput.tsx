@@ -15,7 +15,7 @@ export default function CommentInput() {
   const submitComment = async () => {
     const res = await createComment(selectedPostId, {
       content,
-      parentComentId: "0",
+      parentCommentId: "0",
     });
     await apiProcess(res, async () => {
       fetchSelectedFeedComments(selectedPostId);

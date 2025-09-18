@@ -8,7 +8,6 @@ export default function BottomNav({
 }: {
   onNavigate?: (path: string) => void;
 }) {
-  const router = useRouter();
   const fallbackRouter = useRouter(); // props 없으면 기본 router 사용
 
   const handlePress = (path: string) => {
@@ -61,7 +60,7 @@ export default function BottomNav({
               aspectRatio: 1,
               width: 27,
               height: 26,
-              transform: "translateY(-2x)",
+              transform: "translateY(-2px)",
             }}
           />
         </TouchableOpacity>

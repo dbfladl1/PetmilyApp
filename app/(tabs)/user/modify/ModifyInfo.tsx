@@ -342,7 +342,7 @@ export default function ModifyInfo() {
 
             <View style={styles.btnContainer}>
               <CLongBtn style={styles.button} onPress={modify}>
-                <CText style={styles.smallButtonText}>회원정보 수ㄴㄴ정</CText>
+                <CText style={styles.smallButtonText}>회원정보 수정</CText>
               </CLongBtn>
             </View>
           </ScrollView>

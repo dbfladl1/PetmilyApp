@@ -20,7 +20,7 @@ export const loadComment = async (feedId: string) => {
 
 export const createComment = async (
   feedId: string,
-  data: { content: string; parentComentId: string }
+  data: { content: string; parentCommentId: string }
 ) => {
   const response = await ApiService.post(
     `/api/v1/feed/${feedId}/comments`,
@@ -47,8 +47,6 @@ export const addLike = async (data: { postId: string }) => {
 export const deleteFeed = async (id: string) => {
   const response = await ApiService.delete(`/api/v1/feed/${id}`);
 
-
-  console.log("del", response)
   return response;
 };
 
